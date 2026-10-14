@@ -1,0 +1,8 @@
+{
+  "access_token": "ya29.fixture-calendar-access",
+  "expires_in": 3599,
+  "refresh_token": "1//fixture-calendar-refresh",
+  "scope": "openid email profile https://www.googleapis.com/auth/calendar.readonly",
+  "token_type": "Bearer",
+  "id_token": "fixture-id-token"
+}

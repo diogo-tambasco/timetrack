@@ -1,0 +1,227 @@
+/* ============================================================
+   Timetrack — design tokens + core components
+   Dark-first · neutral near-black · configurable accent
+   Reuse in React/Vite/Tailwind: these are the source-of-truth
+   custom properties. Map them into tailwind.config theme.extend.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* type */
+  --font-ui: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+
+  /* surfaces — DARK (default). neutral, no blue cast */
+  --bg:          #0e0e10;
+  --surface-1:   #161619;   /* sidebars, bars */
+  --surface-2:   #1c1c20;   /* cards, raised */
+  --surface-3:   #26262b;   /* hover / active */
+  --border:      rgba(255,255,255,0.07);
+  --border-2:    rgba(255,255,255,0.12);
+  --shadow:      0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.32);
+
+  /* text */
+  --text-1: #f3f3f5;
+  --text-2: #a5a5ad;
+  --text-3: #6c6c74;
+
+  /* accent — user-configurable. default: calm teal */
+  --accent:      #2dd4bf;
+  --accent-ink:  #04221d;          /* text/icon on accent fills */
+  --accent-soft: rgba(45,212,191,.14);
+  --accent-line: rgba(45,212,191,.40);
+
+  /* live state */
+  --live: #2dd4bf;                 /* mirrors accent unless overridden */
+
+  /* project colors (calm, distinct — never magenta/red) */
+  --p-acme: #4f9dde;
+  --p-lauda:    #b07cd6;
+  --p-arkan:    #e0a13c;
+  --p-primor:   #5cc98b;
+  --p-freela:   #c9806a;
+
+  /* radius */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  /* density — COMFORTABLE (default) */
+  --row-h: 46px;
+  --pad: 18px;
+  --pad-sm: 12px;
+  --gap: 14px;
+  --fs-row: 14px;
+  --fs-label: 12px;
+}
+
+[data-theme="light"] {
+  --bg:        #f4f4f2;
+  --surface-1: #ffffff;
+  --surface-2: #ffffff;
+  --surface-3: #ececea;
+  --border:    rgba(0,0,0,0.08);
+  --border-2:  rgba(0,0,0,0.14);
+  --shadow:    0 1px 2px rgba(0,0,0,.06), 0 8px 28px rgba(0,0,0,.08);
+  --text-1: #18181b;
+  --text-2: #5a5a62;
+  --text-3: #8c8c94;
+  --accent-ink: #04221d;
+}
+
+[data-density="compact"] {
+  --row-h: 32px;
+  --pad: 12px;
+  --pad-sm: 8px;
+  --gap: 9px;
+  --fs-row: 13px;
+  --fs-label: 11px;
+}
+
+/* ---------- primitives ---------- */
+.tt {
+  font-family: var(--font-ui);
+  color: var(--text-1);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+/* buttons */
+.tt-btn {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 540;
+  border: 1px solid var(--border-2); background: var(--surface-2);
+  color: var(--text-1); border-radius: var(--r-md);
+  padding: 8px 14px; cursor: pointer; display: inline-flex;
+  align-items: center; gap: 8px; transition: background .14s, border-color .14s, transform .06s;
+  white-space: nowrap;
+}
+.tt-btn:hover { background: var(--surface-3); }
+.tt-btn:active { transform: translateY(.5px); }
+.tt-btn--ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.tt-btn--ghost:hover { background: var(--surface-2); color: var(--text-1); }
+.tt-btn--accent {
+  background: var(--accent); color: var(--accent-ink);
+  border-color: transparent; font-weight: 600;
+}
+.tt-btn--accent:hover { filter: brightness(1.06); background: var(--accent); }
+
+/* play / stop pill */
+.tt-iconbtn {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  display: grid; place-items: center; transition: filter .14s, background .14s, transform .06s;
+}
+.tt-iconbtn:active { transform: scale(.94); }
+.tt-iconbtn--go { background: var(--accent); color: var(--accent-ink); }
+.tt-iconbtn--stop { background: var(--surface-3); color: var(--text-1); }
+
+/* project chip */
+.tt-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 540; color: var(--text-1);
+  padding: 3px 10px 3px 8px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+
+/* card / panel */
+.tt-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.tt-panel { background: var(--surface-1); border: 1px solid var(--border); }
+
+/* goal progress */
+.tt-goal { height: 5px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.tt-goal > i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+
+/* nav item */
+.tt-nav {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px; border-radius: var(--r-md);
+  color: var(--text-2); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background .14s, color .14s;
+}
+.tt-nav:hover { background: var(--surface-2); color: var(--text-1); }
+.tt-nav[aria-current="true"] { background: var(--surface-2); color: var(--text-1); }
+.tt-nav[aria-current="true"] .tt-navicon { color: var(--accent); }
+.tt-navicon { width: 18px; height: 18px; flex: 0 0 auto; color: var(--text-3); }
+
+/* live timer running indicator */
+.tt-pulse { position: relative; }
+.tt-pulse::before {
+  content: ''; position: absolute; inset: -4px; border-radius: inherit;
+  box-shadow: 0 0 0 0 var(--accent-line);
+  animation: ttpulse 2.4s ease-out infinite;
+}
+@keyframes ttpulse {
+  0% { box-shadow: 0 0 0 0 var(--accent-line); }
+  70% { box-shadow: 0 0 0 8px rgba(45,212,191,0); }
+  100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+}
+
+/* hide scrollbars inside frames */
+.tt ::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ---- hover-expand sidebar ----
+   Collapsed 64px icon rail. On hover the inner panel widens to 232px as an
+   OVERLAY (absolute) so page content never reflows. This is the canonical
+   nav behaviour across all surfaces. */
+.tt-sidenav { width: 64px; flex: 0 0 auto; position: relative; z-index: 30; }
+.tt-sidenav-inner {
+  position: absolute; inset: 0 auto 0 0; width: 64px; overflow: hidden;
+  background: var(--surface-1); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 3px; padding: var(--pad-sm);
+  transition: width .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s;
+}
+.tt-sidenav:hover .tt-sidenav-inner { width: 232px; box-shadow: 14px 0 40px rgba(0,0,0,.32); }
+.tt-sidenav .tt-nav { gap: 13px; white-space: nowrap; }
+.tt-sidenav .tt-navlabel { opacity: 0; transition: opacity .14s; }
+.tt-sidenav:hover .tt-navlabel { opacity: 1; }
+.tt-sidenav .tt-brandname { opacity: 0; transition: opacity .14s; }
+.tt-sidenav:hover .tt-brandname { opacity: 1; }
+[data-theme="light"] .tt-sidenav:hover .tt-sidenav-inner { box-shadow: 14px 0 40px rgba(0,0,0,.1); }
+
+/* ---- avatar ---- */
+.tt-avatar {
+  width: 30px; height: 30px; border-radius: 50%; flex: 0 0 auto;
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 600;
+  color: var(--accent-ink); letter-spacing: .02em;
+}
+
+/* ---- role badge ---- */
+.tt-role {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 540;
+  padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-2); color: var(--text-2);
+}
+.tt-role--owner { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+
+/* ---- toggle switch ---- */
+.tt-switch {
+  width: 38px; height: 22px; border-radius: 999px; background: var(--surface-3);
+  border: 1px solid var(--border-2); position: relative; cursor: pointer; flex: 0 0 auto;
+  transition: background .16s, border-color .16s;
+}
+.tt-switch > i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--text-2); transition: transform .16s, background .16s; }
+.tt-switch[aria-checked="true"] { background: var(--accent); border-color: transparent; }
+.tt-switch[aria-checked="true"] > i { transform: translateX(16px); background: var(--accent-ink); }
+
+/* ---- data table (shown on user selection) ---- */
+.tt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tt-table th {
+  text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.tt-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); }
+.tt-table tr:hover td { background: var(--surface-2); }
+.tt-table td.num, .tt-table th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }

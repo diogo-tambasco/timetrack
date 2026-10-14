@@ -1,0 +1,47 @@
+@import './fonts.css';
+@import './tokens.css';
+@import 'tailwindcss';
+
+/* Tokens do tokens.css mapeados no tema do Tailwind v4 (fonte de verdade
+   visual — D-05 da fase 00). Classes como bg-bg, bg-surface-1, text-accent
+   e font-mono saem daqui, sempre apontando pras custom properties.
+   `static` (não `inline`): o mapeamento precisa ser EMITIDO no artefato
+   (acceptance check da T-09) e resolvido em runtime pro data-theme valer. */
+@theme static {
+  --color-bg: var(--bg);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border-1: var(--border);
+  --color-border-2: var(--border-2);
+  --color-text-1: var(--text-1);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  --color-live: var(--live);
+  --color-danger: var(--danger);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}

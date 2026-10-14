@@ -1,0 +1,20 @@
+/* Inter (UI) + Geist Mono (números/tempo) self-hosted (CA-27 da fase 24 /
+   CA-13/D-08 da fase 00). Fontes variáveis (wght 100–900) servidas pelo próprio
+   app — sem CDN. A fase 24 trocou a UI de Geist → Inter (a fonte do Notion); o
+   mono fica Geist Mono. O @import do Google Fonts do protótipo NUNCA entra aqui. */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../assets/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../assets/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

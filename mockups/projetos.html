@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark" data-density="comfortable">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Timetrack — Projetos (espelho de produção)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Tokens (cópia fiel de tokens.css — mesmos do app em produção)
+   ============================================================ */
+:root {
+  --font-ui: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+
+  --bg:          #0e0e10;
+  --surface-1:   #161619;
+  --surface-2:   #1c1c20;
+  --surface-3:   #26262b;
+  --border:      rgba(255,255,255,0.07);
+  --border-2:    rgba(255,255,255,0.12);
+  --shadow:      0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.32);
+
+  --text-1: #f3f3f5;
+  --text-2: #a5a5ad;
+  --text-3: #6c6c74;
+
+  --accent:      #2dd4bf;
+  --accent-ink:  #04221d;
+  --accent-soft: rgba(45,212,191,.14);
+  --accent-line: rgba(45,212,191,.40);
+  --live: #2dd4bf;
+
+  --p-acme: #4f9dde;
+  --p-lauda:    #b07cd6;
+  --p-arkan:    #e0a13c;
+  --p-primor:   #5cc98b;
+  --p-freela:   #c9806a;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  --row-h: 46px;
+  --pad: 18px;
+  --pad-sm: 12px;
+  --gap: 14px;
+  --fs-row: 14px;
+  --fs-label: 12px;
+}
+[data-theme="light"] {
+  --bg:        #f4f4f2;
+  --surface-1: #ffffff;
+  --surface-2: #ffffff;
+  --surface-3: #ececea;
+  --border:    rgba(0,0,0,0.08);
+  --border-2:  rgba(0,0,0,0.14);
+  --shadow:    0 1px 2px rgba(0,0,0,.06), 0 8px 28px rgba(0,0,0,.08);
+  --text-1: #18181b;
+  --text-2: #5a5a62;
+  --text-3: #8c8c94;
+  --accent-ink: #04221d;
+}
+
+html, body { margin: 0; height: 100%; background: var(--bg); }
+* { box-sizing: border-box; }
+
+.tt {
+  font-family: var(--font-ui);
+  color: var(--text-1);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+/* buttons */
+.tt-btn {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 540;
+  border: 1px solid var(--border-2); background: var(--surface-2);
+  color: var(--text-1); border-radius: var(--r-md);
+  padding: 8px 14px; cursor: pointer; display: inline-flex;
+  align-items: center; gap: 8px; transition: background .14s, border-color .14s, transform .06s;
+  white-space: nowrap; text-decoration: none;
+}
+.tt-btn:hover { background: var(--surface-3); }
+.tt-btn:active { transform: translateY(.5px); }
+.tt-btn--ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.tt-btn--ghost:hover { background: var(--surface-2); color: var(--text-1); }
+.tt-btn--accent {
+  background: var(--accent); color: var(--accent-ink);
+  border-color: transparent; font-weight: 600;
+}
+.tt-btn--accent:hover { filter: brightness(1.06); background: var(--accent); }
+
+.tt-iconbtn {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  display: grid; place-items: center; transition: filter .14s, background .14s, transform .06s;
+}
+.tt-iconbtn:active { transform: scale(.94); }
+
+.tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+
+.tt-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-lg); }
+.tt-panel { background: var(--surface-1); border: 1px solid var(--border); }
+
+.tt-goal { height: 5px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.tt-goal > i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+
+/* nav item */
+.tt-nav {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px; border-radius: var(--r-md);
+  color: var(--text-2); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background .14s, color .14s;
+}
+.tt-nav:hover { background: var(--surface-2); color: var(--text-1); }
+.tt-nav[aria-current="true"] { background: var(--surface-2); color: var(--text-1); }
+.tt-nav[aria-current="true"] .tt-navicon { color: var(--accent); }
+.tt-navicon { width: 18px; height: 18px; flex: 0 0 auto; color: var(--text-3); }
+
+/* data table (visão Tabela) */
+.tt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tt-table th {
+  text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.tt-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); }
+.tt-table tr:hover td { background: var(--surface-2); }
+.tt-table td.num, .tt-table th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+
+.tt ::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ---- hover-expand sidebar ---- */
+.tt-sidenav { width: 64px; flex: 0 0 auto; position: relative; z-index: 30; }
+.tt-sidenav-inner {
+  position: absolute; inset: 0 auto 0 0; width: 64px; overflow: hidden;
+  background: var(--surface-1); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 3px; padding: var(--pad-sm);
+  transition: width .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s;
+}
+.tt-sidenav:hover .tt-sidenav-inner { width: 232px; box-shadow: 14px 0 40px rgba(0,0,0,.32); }
+.tt-sidenav .tt-nav { gap: 13px; white-space: nowrap; }
+.tt-sidenav .tt-navlabel { opacity: 0; transition: opacity .14s; }
+.tt-sidenav:hover .tt-navlabel { opacity: 1; }
+.tt-sidenav .tt-brandname { opacity: 0; transition: opacity .14s; }
+.tt-sidenav:hover .tt-brandname { opacity: 1; }
+[data-theme="light"] .tt-sidenav:hover .tt-sidenav-inner { box-shadow: 14px 0 40px rgba(0,0,0,.1); }
+
+/* board columns (visão Cartões do board) */
+.board-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: start; }
+@media (max-width: 768px) { .board-cols { grid-template-columns: 1fr; } }
+
+.themebtn { position: fixed; top: 14px; right: 16px; z-index: 50; }
+</style>
+</head>
+<body>
+<div class="tt" id="root" style="width:100%;height:100vh;display:flex;overflow:hidden">
+
+  <!-- SideNav (rail hover-expand) -->
+  <aside class="tt-sidenav">
+    <div class="tt-sidenav-inner">
+      <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 16px">
+        <span style="width:24px;height:24px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:0 0 auto">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        </span>
+        <span class="tt-brandname" style="font-weight:600;font-size:15px;letter-spacing:-.02em">Timetrack</span>
+      </div>
+      <div id="nav"></div>
+      <div style="flex:1"></div>
+      <div class="tt-nav">
+        <svg class="tt-navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.5M12 19v2.5M4.2 7l2.1 1.3M17.7 15.7l2.1 1.3M19.8 7l-2.1 1.3M6.3 15.7L4.2 17M2.5 12H5M19 12h2.5"/></svg>
+        <span class="tt-navlabel">Ajustes</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- main: o conteúdo (lista OU detalhe) é renderizado pelo JS -->
+  <main id="main" style="flex:1;min-width:0;display:flex;flex-direction:column;padding:26px;gap:20px;overflow:auto"></main>
+</div>
+
+<button class="tt-btn themebtn" onclick="toggleTheme()">Tema</button>
+
+<script>
+// ============================================================
+// Dados — espelham o que produção RENDERIZA hoje na lista:
+//  · Esta semana = 0h (hardcoded desde a fase 02) · Total = "—" · Status Ativo/Arquivado
+// E o detalhe (board) com objetivos + bucket "Geral", igual à fase 12.
+// ============================================================
+const PROJECTS = [
+  { id:'lh', name:'Acme', client:'Acme',    color:'var(--p-acme)', weekly_hours_goal:18, archived:false },
+  { id:'la', name:'Lauda',    client:'Lauda',       color:'var(--p-lauda)',    weekly_hours_goal:12, archived:false },
+  { id:'ak', name:'Arkan',    client:'Arkan',       color:'var(--p-arkan)',    weekly_hours_goal:8,  archived:false },
+  { id:'pr', name:'Primor',   client:'Primor Labs', color:'var(--p-primor)',   weekly_hours_goal:14, archived:false },
+  { id:'fr', name:'Freela',   client:'Avulso',      color:'var(--p-freela)',   weekly_hours_goal:null, archived:false },
+];
+const PROJ_BY_ID = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+const HOURS = 0; // a lista mostra 0h até a fase 03 ligar horas reais
+
+// boards por projeto: objetivos (cada um com tasks) + bucket Geral.
+// tracked_seconds em segundos. tasks: { id, name, status, due_date, tracked_seconds }
+let BOARDS = {
+  lh: {
+    tracked_seconds: 511200,
+    objectives: [
+      { id:'lh-o1', name:'Roadmap Q3', description:'Planejar e fechar o trimestre', goal_hours:40, tasks:[
+        { id:'lh-t1', name:'Sprint review + roadmap', status:'done',  due_date:'2025-06-20', tracked_seconds:3540 },
+        { id:'lh-t2', name:'Definir OKRs Q3',          status:'doing', due_date:'2025-06-25', tracked_seconds:7200 },
+        { id:'lh-t3', name:'Call cliente — escopo Q3',  status:'todo',  due_date:'2025-06-28', tracked_seconds:0 },
+      ]},
+    ],
+    general: [ { id:'lh-g1', name:'Daily standup', status:'todo', due_date:null, tracked_seconds:1200 } ],
+  },
+  la: {
+    tracked_seconds: 316800,
+    objectives: [
+      { id:'la-o1', name:'Revisão de laudas', description:null, goal_hours:30, tasks:[
+        { id:'la-t1', name:'Revisão — lote 14', status:'done',  due_date:'2025-06-18', tracked_seconds:5280 },
+        { id:'la-t2', name:'Revisão — lote 15', status:'doing', due_date:'2025-06-24', tracked_seconds:3600 },
+      ]},
+    ],
+    general: [ { id:'la-g1', name:'Sync laudas', status:'todo', due_date:null, tracked_seconds:0 } ],
+  },
+  ak: {
+    tracked_seconds: 129600,
+    objectives: [
+      { id:'ak-o1', name:'API de tokens', description:'Skill /timetrack-task', goal_hours:12, tasks:[
+        { id:'ak-t1', name:'Endpoint de tokens', status:'done', due_date:null, tracked_seconds:6000 },
+        { id:'ak-t2', name:'Testes do endpoint', status:'done', due_date:null, tracked_seconds:4200 },
+      ]},
+    ],
+    general: [],
+  },
+  pr: {
+    tracked_seconds: 230400,
+    objectives: [
+      { id:'pr-o1', name:'PrimaOS — infra', description:null, goal_hours:20, tasks:[
+        { id:'pr-t1', name:'Deploy Caddy', status:'doing', due_date:'2025-06-23', tracked_seconds:1900 },
+        { id:'pr-t2', name:'vhost + TLS',  status:'todo',  due_date:null, tracked_seconds:0 },
+      ]},
+    ],
+    general: [ { id:'pr-g1', name:'Backup automatizado', status:'todo', due_date:null, tracked_seconds:0 } ],
+  },
+  fr: {
+    tracked_seconds: 75600,
+    objectives: [],
+    general: [
+      { id:'fr-g1', name:'Freela — landing hero', status:'doing', due_date:'2025-06-26', tracked_seconds:5070 },
+      { id:'fr-g2', name:'Freela — ajustes finais', status:'todo', due_date:null, tracked_seconds:0 },
+    ],
+  },
+};
+
+// ---- derivados de objetivo (espelha o backend: done_count/task_count/done_pct/status) ----
+function objStats(o){
+  const task_count = o.tasks.length;
+  const done_count = o.tasks.filter(t=>t.status==='done').length;
+  const done_pct = task_count ? Math.round(done_count/task_count*100) : 0;
+  const tracked_seconds = o.tasks.reduce((s,t)=>s+t.tracked_seconds,0);
+  const status = task_count>0 && done_count===task_count ? 'done' : 'open';
+  return { task_count, done_count, done_pct, tracked_seconds, status };
+}
+function projectTaskCount(id){
+  const b = BOARDS[id]; if(!b) return 0;
+  return b.objectives.reduce((s,o)=>s+o.tasks.length,0) + b.general.length;
+}
+
+// ============================================================
+// Ícones + nav
+// ============================================================
+const NAV = [
+  ['today','Hoje','today'], ['cal','Calendário','cal'],
+  ['proj','Projetos','folder'], ['clients','Clientes','briefcase'],
+  ['rep','Relatórios','chart'], ['ws','Workspace','users'],
+  ['foco','Foco','focus'],
+];
+const ICONS = {
+  today:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><circle cx="12" cy="14.5" r="2" fill="currentColor" stroke="none"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4M7.5 13h2M11 13h2M14.5 13h2M7.5 16.5h2M11 16.5h2"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M3 12h18"/>',
+  chart:'<path d="M4 20V4M4 20h16M8 16v-4M12.5 16V9M17 16v-7"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M17 19a5.5 5.5 0 0 0-2.2-4.4"/>',
+  focus:'<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><circle cx="12" cy="12" r="2.5"/>',
+};
+function navIcon(name){
+  return `<svg class="tt-navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+}
+function ic(path, size=14, sw=1.7, style=''){
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="${style}">${path}</svg>`;
+}
+const P = {
+  cliente:'<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>',
+  list:'<path d="M8 6h12M8 12h12M8 18h12M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  table:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  chevron:'<path d="M6 9l6 6 6-6"/>',
+  check:'<path d="M4.5 12.5l5 5 10-11"/>',
+  trash:'<path d="M4 7h16M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M6 7l1 13h10l1-13"/>',
+};
+
+document.getElementById('nav').innerHTML = NAV.map(([k,label,icon]) =>
+  `<div class="tt-nav" aria-current="${k==='proj'}">${navIcon(icon)}<span class="tt-navlabel">${label}</span></div>`
+).join('');
+
+// ============================================================
+// Helpers de formatação (espelham lib/format.ts)
+// ============================================================
+const fmtDayTotal = sec => { const s=Math.max(0,Math.floor(sec)); return `${Math.floor(s/3600)}h${String(Math.floor((s%3600)/60)).padStart(2,'0')}`; };
+const tasksLabel = n => `${n} task${n===1?'':'s'}`;
+const dataBr = iso => iso.split('-').reverse().join('/');
+const STATUS_LABEL = { todo:'A fazer', doing:'Fazendo', done:'Feito' };
+const ORDER = ['todo','doing','done'];
+
+function statusPill(archived){
+  return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:540;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:${archived?'var(--text-3)':'var(--text-2)'};white-space:nowrap">
+    <i class="tt-dot" style="width:6px;height:6px;background:${archived?'var(--text-3)':'var(--accent)'}"></i>${archived?'Arquivado':'Ativo'}
+  </span>`;
+}
+function goalBar(color, hours, goal){
+  if (goal === null || goal <= 0) return '';
+  const pct = Math.min(100, Math.round((hours/goal)*100));
+  return `<div class="tt-goal"><i style="width:${pct}%;background:${pct>=100?'var(--accent)':color}"></i></div>`;
+}
+
+// ============================================================
+// Estado de navegação (router dentro do HTML)
+// ============================================================
+const state = {
+  route: 'list',           // 'list' | { detail: projectId }
+  view: localStorage.getItem('tt.view.projects')==='table' ? 'table' : 'cards',
+  boardView: localStorage.getItem('tt.view.board')==='table' ? 'table' : 'cards',
+};
+function go(route){ state.route = route; render(); }
+
+// ============================================================
+// PÁGINA: Lista de projetos (cards + tabela)
+// ============================================================
+function viewToggle(current, onCards, onTable){
+  const btn = (v,label,glyph,active) =>
+    `<button type="button" data-view="${v}" onclick="${active}"
+      style="border:none;cursor:pointer;font-family:var(--font-ui);font-size:12.5px;font-weight:540;padding:6px 12px;border-radius:7px;display:flex;align-items:center;gap:6px;background:${current===v?'var(--surface-1)':'transparent'};color:${current===v?'var(--text-1)':'var(--text-2)'}">
+      ${ic(P[glyph])}${label}</button>`;
+  return `<div style="display:flex;background:var(--surface-3);border-radius:9px;padding:2px;gap:2px">
+    ${btn('cards','Cartões','grid',onCards)}${btn('table','Tabela','table',onTable)}
+  </div>`;
+}
+
+function projectCard(p){
+  const goalBlock = p.weekly_hours_goal !== null ? `
+    <div>
+      <div style="display:flex;justify-content:space-between;white-space:nowrap;margin-bottom:6px">
+        <span class="mono" style="font-size:12px;font-weight:540">${HOURS}h</span>
+        <span class="mono faint" style="font-size:11.5px">meta ${p.weekly_hours_goal}h</span>
+      </div>
+      ${goalBar(p.color, HOURS, p.weekly_hours_goal)}
+    </div>` : '';
+  const n = projectTaskCount(p.id);
+  return `
+  <div class="tt-card" style="padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--surface-1)">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <span style="width:4px;height:30px;border-radius:3px;background:${p.color};flex:0 0 auto;margin-top:2px"></span>
+      <div style="flex:1;min-width:0">
+        <a href="#" onclick="event.preventDefault();go({detail:'${p.id}'})" style="display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-1);text-decoration:none">${p.name}</a>
+        <div class="faint" style="font-size:11.5px;margin-top:1px">${tasksLabel(n)}</div>
+      </div>
+      ${statusPill(p.archived)}
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2)">
+      ${ic(P.cliente,14,1.7,'color:var(--text-3)')}${p.client ?? '—'}
+    </div>
+    ${goalBlock}
+    <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;justify-content:space-between;gap:4px">
+      <a href="#" class="tt-btn tt-btn--ghost" onclick="event.preventDefault();go({detail:'${p.id}'})">${ic(P.list)}Abrir</a>
+      <div style="display:flex;gap:4px">
+        <button type="button" class="tt-btn tt-btn--ghost">Editar</button>
+        <button type="button" class="tt-btn tt-btn--ghost">Arquivar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function projectsTableRow(p){
+  const n = projectTaskCount(p.id);
+  return `<tr>
+    <td>
+      <a href="#" onclick="event.preventDefault();go({detail:'${p.id}'})" style="color:inherit;text-decoration:none">
+        <span style="display:flex;align-items:center;gap:9px;font-weight:540">
+          <span style="width:4px;height:22px;border-radius:3px;background:${p.color}"></span>
+          <span>${p.name}<span class="faint" style="font-size:11.5px;display:block">${tasksLabel(n)}</span></span>
+        </span>
+      </a>
+    </td>
+    <td class="muted">${p.client ?? '—'}</td>
+    <td class="num">0h</td>
+    <td class="num muted">—</td>
+    <td>${statusPill(p.archived)}</td>
+    <td style="text-align:right;white-space:nowrap">
+      <button type="button" class="tt-btn tt-btn--ghost">Editar</button>
+      <button type="button" class="tt-btn tt-btn--ghost">Arquivar</button>
+    </td>
+  </tr>`;
+}
+
+function renderList(){
+  const nClientes = new Set(PROJECTS.map(p=>p.client).filter(Boolean)).size;
+  const body = state.view==='cards'
+    ? `<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr));grid-auto-rows:min-content;gap:16px;align-content:start">
+        ${PROJECTS.map(projectCard).join('')}
+       </div>`
+    : `<div class="tt-panel" style="border-radius:var(--r-lg);overflow:auto">
+        <table class="tt-table">
+          <thead><tr><th>Projeto</th><th>Cliente</th><th class="num">Esta semana</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+          <tbody>${PROJECTS.map(projectsTableRow).join('')}</tbody>
+        </table>
+       </div>`;
+  return `
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <p class="eyebrow" style="white-space:nowrap;margin:0">${PROJECTS.length} projeto${PROJECTS.length===1?'':'s'} · ${nClientes} cliente${nClientes===1?'':'s'}</p>
+        <h1 style="margin:4px 0 0;font-size:26px;font-weight:600;letter-spacing:-.02em">Projetos</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${viewToggle(state.view, "setListView('cards')", "setListView('table')")}
+        <button class="tt-btn tt-btn--accent">${ic(P.plus,15,2.2)}Novo projeto</button>
+      </div>
+    </div>
+    ${body}`;
+}
+function setListView(v){ state.view=v; localStorage.setItem('tt.view.projects',v); render(); }
+
+// ============================================================
+// PÁGINA: Detalhe do projeto (board de objetivos + Geral)
+// ============================================================
+function progressBar(o, color){
+  const st = objStats(o);
+  const hasGoal = o.goal_hours !== null && o.goal_hours > 0;
+  const tasksBar = `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px;white-space:nowrap">
+        <span class="faint">${st.done_count}/${st.task_count} ${st.task_count===1?'task':'tasks'}</span>
+        <span class="mono" style="font-weight:540">${st.done_pct}%</span>
+      </div>
+      <div class="tt-goal"><i style="width:${st.done_pct}%;background:${st.done_pct>=100?'var(--accent)':color}"></i></div>
+    </div>`;
+  const hoursBar = hasGoal ? `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px;white-space:nowrap">
+        <span class="mono faint">${fmtDayTotal(st.tracked_seconds)}</span>
+        <span class="mono faint">meta ${o.goal_hours}h</span>
+      </div>
+      ${goalBar(color, st.tracked_seconds/3600, o.goal_hours)}
+    </div>` : '';
+  return `<div style="display:flex;flex-direction:column;gap:9px">${tasksBar}${hoursBar}</div>`;
+}
+
+// visão Cartões do board (3 colunas todo/doing/done com mover ‹ ›)
+function boardColumns(tasks){
+  const col = (status,label) => {
+    const colTasks = tasks.filter(t=>t.status===status);
+    const cards = colTasks.map(t=>{
+      const idx = ORDER.indexOf(t.status);
+      const moveBtn = (dir,disabled,rot) =>
+        `<button type="button" class="tt-iconbtn" ${disabled?'disabled':''}
+          onclick="moveTask('${t.id}', ${dir})"
+          style="width:24px;height:24px;background:transparent;color:var(--text-3);opacity:${disabled?0.35:1};cursor:${disabled?'default':'pointer'}">
+          ${ic(P.chevron,15,1.7,`transform:rotate(${rot}deg)`)}</button>`;
+      return `<div class="tt-card" style="background:var(--surface-1);padding:10px;display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12.5px;font-weight:500;word-break:break-word">${t.name}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+          <span class="mono faint" style="font-size:11px">${fmtDayTotal(t.tracked_seconds)}</span>
+          <div style="display:flex;align-items:center;gap:2px">
+            ${moveBtn(-1, idx===0, 90)}
+            ${moveBtn(1, idx===ORDER.length-1, -90)}
+            <button type="button" class="tt-btn tt-btn--ghost" style="padding:3px 8px;font-size:11.5px">Editar</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="background:var(--surface-2);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:56px">
+      <div class="eyebrow" style="display:flex;justify-content:space-between;padding:2px 4px"><span>${label}</span><span class="mono">${colTasks.length}</span></div>
+      ${cards || '<span class="faint" style="font-size:11.5px;padding:2px 4px">—</span>'}
+    </div>`;
+  };
+  return `<div class="board-cols">${col('todo','A fazer')}${col('doing','Fazendo')}${col('done','Feito')}</div>`;
+}
+
+// visão Lista do board
+function boardRows(tasks){
+  if (tasks.length===0) return `<div style="display:flex;flex-direction:column"><span class="faint" style="font-size:12px;padding:8px 0">Nenhuma task.</span></div>`;
+  const rows = tasks.map(t=>{
+    const select = `<select onchange="setTaskStatus('${t.id}', this.value)"
+        style="background:var(--surface-2);border:1px solid var(--border-2);border-radius:999px;color:var(--text-2);font:inherit;font-size:11px;font-weight:540;padding:2px 6px">
+        ${ORDER.map(s=>`<option value="${s}" ${s===t.status?'selected':''}>${STATUS_LABEL[s]}</option>`).join('')}
+      </select>`;
+    const done = t.status==='done';
+    return `<div style="display:flex;align-items:center;gap:10px;font-size:13px;min-width:0;padding:7px 0;border-top:1px solid var(--border)">
+      ${select}
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:${done?'line-through':'none'};color:${done?'var(--text-3)':'var(--text-1)'}">${t.name}</span>
+      ${t.due_date?`<span class="mono faint" style="font-size:11.5px;white-space:nowrap">${dataBr(t.due_date)}</span>`:''}
+      <span class="mono faint" style="font-size:11.5px;white-space:nowrap">${fmtDayTotal(t.tracked_seconds)}</span>
+      <button type="button" class="tt-btn tt-btn--ghost">Editar</button>
+    </div>`;
+  }).join('');
+  return `<div style="display:flex;flex-direction:column">${rows}</div>`;
+}
+const renderTasks = tasks => state.boardView==='cards' ? boardColumns(tasks) : boardRows(tasks);
+
+function objectiveCard(o, color){
+  const st = objStats(o);
+  const doneBadge = st.status==='done'
+    ? `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;color:var(--accent);background:var(--accent-soft);white-space:nowrap">${ic(P.check,12,2.4)}Concluído</span>` : '';
+  return `<section class="tt-card" style="padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--surface-1)">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h3 style="margin:0;font-size:15.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.name}</h3>
+          ${doneBadge}
+        </div>
+        ${o.description?`<p class="faint" style="margin:3px 0 0;font-size:12.5px">${o.description}</p>`:''}
+      </div>
+      <div style="display:flex;gap:4px;flex:0 0 auto">
+        <button type="button" class="tt-btn tt-btn--ghost">${ic(P.plus,14,2.2)}Task</button>
+        <button type="button" class="tt-btn tt-btn--ghost">Editar</button>
+        <button type="button" class="tt-btn tt-btn--ghost">${ic(P.trash,14)}</button>
+      </div>
+    </div>
+    ${progressBar(o, color)}
+    ${renderTasks(o.tasks)}
+  </section>`;
+}
+
+function renderDetail(projectId){
+  const p = PROJ_BY_ID[projectId];
+  const b = BOARDS[projectId];
+  const backLink = `<a href="#" class="tt-btn tt-btn--ghost" onclick="event.preventDefault();go('list')" style="align-self:flex-start;text-decoration:none">${ic(P.chevron,15,1.7,'transform:rotate(90deg)')}Projetos</a>`;
+  if (!p || !b) return `<div style="display:flex;flex-direction:column;gap:14px">${backLink}<p class="faint">Projeto não encontrado.</p></div>`;
+
+  const generalTasks = b.general;
+  const showGeneral = generalTasks.length > 0 || true; // canWrite=true neste mockup
+  const general = showGeneral ? `
+    <section class="tt-card" style="padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--surface-1)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <h3 style="margin:0;font-size:15.5px;font-weight:600">Geral</h3>
+          <p class="faint" style="margin:3px 0 0;font-size:12px">Tasks sem objetivo</p>
+        </div>
+        <button type="button" class="tt-btn tt-btn--ghost">${ic(P.plus,14,2.2)}Task</button>
+      </div>
+      ${renderTasks(generalTasks)}
+    </section>` : '';
+
+  const empty = b.objectives.length===0 && generalTasks.length===0
+    ? `<p class="faint">Nenhum objetivo ainda — crie o primeiro pra organizar as tasks.</p>` : '';
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${backLink}
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0">
+          <span style="width:5px;height:32px;border-radius:3px;background:${p.color};flex:0 0 auto"></span>
+          <h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</h1>
+        </div>
+        <div style="text-align:right;white-space:nowrap">
+          <p class="eyebrow" style="margin:0">Tempo total</p>
+          <p class="mono" style="margin:2px 0 0;font-size:18px;font-weight:600">${fmtDayTotal(b.tracked_seconds)}</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        ${viewToggle(state.boardView, "setBoardView('cards')", "setBoardView('table')")}
+        <button type="button" class="tt-btn tt-btn--accent">${ic(P.plus,15,2.2)}Novo objetivo</button>
+      </div>
+      ${b.objectives.map(o=>objectiveCard(o, p.color)).join('')}
+      ${general}
+      ${empty}
+    </div>`;
+}
+function setBoardView(v){ state.boardView=v; localStorage.setItem('tt.view.board',v); render(); }
+
+// ============================================================
+// Mutações (funcionam de verdade no mockup) — mover task de status
+// ============================================================
+function findTask(id){
+  for (const pid in BOARDS){
+    const b = BOARDS[pid];
+    for (const o of b.objectives){ const t=o.tasks.find(t=>t.id===id); if(t) return t; }
+    const g = b.general.find(t=>t.id===id); if(g) return g;
+  }
+  return null;
+}
+function moveTask(id, dir){
+  const t = findTask(id); if(!t) return;
+  const idx = ORDER.indexOf(t.status) + dir;
+  if (idx<0 || idx>=ORDER.length) return;
+  t.status = ORDER[idx];
+  render();
+}
+function setTaskStatus(id, status){
+  const t = findTask(id); if(!t) return;
+  t.status = status;
+  render();
+}
+
+// ============================================================
+// Render raiz (router)
+// ============================================================
+function render(){
+  const main = document.getElementById('main');
+  main.scrollTop = 0;
+  main.innerHTML = state.route==='list' ? renderList() : renderDetail(state.route.detail);
+}
+function toggleTheme(){
+  const el = document.documentElement;
+  el.dataset.theme = el.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+render();
+</script>
+</body>
+</html>

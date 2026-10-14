@@ -1,0 +1,36 @@
+# Segredos — NUNCA versionar
+SECRETS.local.md
+.env
+.env.*
+!.env.example
+*.key
+*_ed25519
+*_ed25519.pub
+
+# Banco local de dev
+*.sqlite3
+*.db
+/backend/data/
+
+# Build / deps
+node_modules/
+/frontend/dist/
+/backend/bin/
+/backend/tmp/
+
+# OS
+.DS_Store
+
+# Export do claude.design: versionamos a pasta extraída, não o zip
+Design/*.zip
+
+# Playwright
+/frontend/test-results/
+/frontend/playwright-report/
+
+# artefatos de build incremental do tsc (verificação adversarial fase 03 bloco 3)
+*.tsbuildinfo
+
+# artefatos locais (raiz): playwright rodado fora de frontend/ + config local do harness
+/test-results/
+/.claude/

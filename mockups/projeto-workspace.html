@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark" data-density="comfortable">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Timetrack — Projeto (rascunho Notion/Linear)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+  --bg:#0e0e10; --surface-1:#161619; --surface-2:#1c1c20; --surface-3:#26262b;
+  --border:rgba(255,255,255,0.07); --border-2:rgba(255,255,255,0.12);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.32);
+  --text-1:#f3f3f5; --text-2:#a5a5ad; --text-3:#6c6c74;
+  --accent:#2dd4bf; --accent-ink:#04221d; --accent-soft:rgba(45,212,191,.14); --accent-line:rgba(45,212,191,.40);
+  --p-acme:#4f9dde; --p-lauda:#b07cd6; --p-arkan:#e0a13c; --p-primor:#5cc98b; --p-freela:#c9806a;
+  --warn:#e0a13c; --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:20px; --pad-sm:12px;
+}
+[data-theme="light"]{
+  --bg:#f4f4f2; --surface-1:#ffffff; --surface-2:#ffffff; --surface-3:#ececea;
+  --border:rgba(0,0,0,0.08); --border-2:rgba(0,0,0,0.14);
+  --text-1:#18181b; --text-2:#5a5a62; --text-3:#8c8c94; --accent-ink:#04221d;
+}
+html,body{margin:0;height:100%;background:var(--bg)} *{box-sizing:border-box}
+body{font-family:var(--font-ui);color:var(--text-1);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-.01em}
+.tt{font-family:var(--font-ui);color:var(--text-1);background:var(--bg);-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.faint{color:var(--text-3)} .muted{color:var(--text-2)}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.tt-btn{font-family:var(--font-ui);font-size:13px;font-weight:540;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text-1);border-radius:var(--r-md);padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .14s,border-color .14s,transform .06s;white-space:nowrap;text-decoration:none}
+.tt-btn:hover{background:var(--surface-3)} .tt-btn:active{transform:translateY(.5px)}
+.tt-btn--ghost{background:transparent;border-color:transparent;color:var(--text-2)} .tt-btn--ghost:hover{background:var(--surface-2);color:var(--text-1)}
+.tt-btn--accent{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600} .tt-btn--accent:hover{filter:brightness(1.06)}
+.tt-btn--sm{padding:5px 10px;font-size:12px}
+.tt-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.tt-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg)}
+.tt-panel{background:var(--surface-1);border:1px solid var(--border)}
+.tt-goal{height:5px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.tt-goal>i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.tt-nav{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:var(--r-md);color:var(--text-2);font-size:14px;font-weight:500;cursor:pointer;transition:background .14s,color .14s}
+.tt-nav:hover{background:var(--surface-2);color:var(--text-1)}
+.tt-nav[aria-current="true"]{background:var(--surface-2);color:var(--text-1)}
+.tt-nav[aria-current="true"] .tt-navicon{color:var(--accent)}
+.tt-navicon{width:18px;height:18px;flex:0 0 auto;color:var(--text-3)}
+.tt ::-webkit-scrollbar{width:0;height:0}
+.tt-sidenav{width:64px;flex:0 0 auto;position:relative;z-index:30}
+.tt-sidenav-inner{position:absolute;inset:0 auto 0 0;width:64px;overflow:hidden;background:var(--surface-1);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:3px;padding:var(--pad-sm);transition:width .2s cubic-bezier(.2,.7,.3,1),box-shadow .2s}
+.tt-sidenav:hover .tt-sidenav-inner{width:232px;box-shadow:14px 0 40px rgba(0,0,0,.32)}
+.tt-sidenav .tt-nav{gap:13px;white-space:nowrap}
+.tt-sidenav .tt-navlabel{opacity:0;transition:opacity .14s} .tt-sidenav:hover .tt-navlabel{opacity:1}
+.tt-sidenav .tt-brandname{opacity:0;transition:opacity .14s} .tt-sidenav:hover .tt-brandname{opacity:1}
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:8px 13px;font-size:13px;font-weight:540;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tab:hover{color:var(--text-1)}
+.tab[aria-selected="true"]{color:var(--text-1);border-bottom-color:var(--accent)}
+/* board */
+.board-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start}
+@media (max-width:980px){.board-cols{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.board-cols{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:9px;padding:6px;border-radius:10px;border:1px solid transparent;min-height:80px;transition:background .12s,border-color .12s}
+.col[data-over="true"]{background:var(--surface-2);border-color:var(--accent-line)}
+.tcard{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:11px 12px;display:flex;flex-direction:column;gap:9px;cursor:grab;transition:border-color .14s,background .14s,box-shadow .14s}
+.tcard:hover{border-color:var(--border-2);background:var(--surface-2)}
+.tcard:active{cursor:grabbing}
+.tcard.drag{opacity:.5;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.trow{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.trow:hover{background:var(--surface-2);border-color:var(--border)}
+.seg{display:flex;background:var(--surface-3);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:none;cursor:pointer;font-family:var(--font-ui);font-size:12.5px;font-weight:540;padding:6px 11px;border-radius:7px;display:flex;align-items:center;gap:6px;background:transparent;color:var(--text-2)}
+.seg button[aria-pressed="true"]{background:var(--surface-1);color:var(--text-1)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:540;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text-2);white-space:nowrap}
+.quickadd{display:flex;align-items:center;gap:8px;padding:8px;border:1px dashed var(--border-2);border-radius:8px;color:var(--text-3);font-size:13px;cursor:pointer}
+.quickadd:hover{color:var(--text-1);border-color:var(--text-3)}
+.ntable{width:100%;border-collapse:collapse;font-size:13px}
+.ntable th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.ntable td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-1)}
+.ntable tbody tr{cursor:pointer} .ntable tbody tr:hover td{background:var(--surface-2)}
+.ntable td.num,.ntable th.num{text-align:right;font-family:var(--font-mono)}
+/* panel */
+.mscrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:55}
+.mwrap{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:18px;pointer-events:none}
+.mcard{pointer-events:auto;width:min(1120px,97vw);height:88vh;max-height:95vh;background:var(--surface-1);border:1px solid var(--border-2);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;animation:pop .14s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+.panel-body{padding:24px 34px 30px;display:flex;flex-direction:column;gap:18px}
+/* slash menu dentro da nota */
+.noteedit{flex:1;width:100%;min-height:360px;background:transparent;border:none;outline:none;resize:none;color:var(--text-1);font-family:var(--font-ui);font-size:15px;line-height:1.7;padding:0}
+/* popup central ↔ tela cheia · to-dos na sidebar do lado direito */
+.full{position:fixed;inset:0;background:var(--surface-1);z-index:60;display:flex;flex-direction:column;overflow:hidden;animation:pop .14s ease-out}
+.modalcontent{flex:1;min-height:0;display:flex;overflow:hidden}
+.taskmain{flex:1;min-width:0;overflow:auto;padding:26px 34px 44px;display:flex;flex-direction:column;gap:16px}
+.taskside{width:312px;flex:0 0 auto;border-left:1px solid var(--border);overflow:auto;padding:20px 18px 30px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.notemain{flex:1;min-width:0;overflow:auto;padding:28px 36px 60px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:760px){.taskside{display:none}}
+.todo .star.empty{opacity:0;transition:opacity .12s} .todo:hover .star.empty{opacity:.75}
+.notion-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-2);text-decoration:none;color:var(--text-1);transition:border-color .14s,background .14s}
+.notion-card:hover{border-color:var(--text-3);background:var(--surface-3)}
+.slashmenu{position:absolute;left:0;top:0;z-index:5;background:var(--surface-2);border:1px solid var(--border-2);border-radius:10px;box-shadow:var(--shadow);width:290px;padding:6px;display:none}
+.slashitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer}
+.slashitem:hover,.slashitem.sel{background:var(--surface-3)}
+/* spotlight (Cmd+K) — vive no mesmo popup central */
+.swrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-start;justify-content:center;padding-top:9vh;pointer-events:none}
+.scard{pointer-events:auto;width:min(760px,95vw);background:var(--surface-1);border:1px solid var(--border-2);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.55);overflow:hidden;animation:pop .14s ease-out}
+.spotitem{display:flex;align-items:center;gap:13px;padding:13px 16px;cursor:pointer;border-radius:9px} .spotitem:hover{background:var(--surface-2)}
+/* propriedades estilo Notion (task) */
+.prop{display:flex;align-items:center;gap:10px;min-height:33px;font-size:13px;border-radius:7px;padding:0 6px}
+.prop:hover{background:var(--surface-2)}
+.prop-k{width:150px;flex:0 0 auto;color:var(--text-3);display:flex;align-items:center;gap:8px;font-size:12.5px}
+.prop-v{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.prop-name{background:transparent;border:none;outline:none;color:var(--text-3);font:inherit;font-size:12.5px;width:100%}
+.prop-val{background:transparent;border:none;outline:none;color:var(--text-1);font:inherit;font-size:13px;flex:1;min-width:0}
+.prop-name:focus,.prop-val:focus{color:var(--text-1)}
+.iconx{background:transparent;border:none;color:var(--text-3);cursor:pointer;display:grid;place-items:center;width:22px;height:22px;border-radius:6px;flex:0 0 auto} .iconx:hover{background:var(--surface-3);color:var(--text-1)}
+.field{display:flex;align-items:center;gap:10px;font-size:13px}
+.field>.k{width:96px;color:var(--text-3);display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.md h2{font-size:18px;margin:14px 0 6px} .md h3{font-size:15px;margin:12px 0 5px} .md h4{font-size:13.5px;margin:10px 0 4px;color:var(--text-2)}
+.md{font-size:13.5px;line-height:1.6;color:var(--text-1)} .md code{font-family:var(--font-mono);font-size:12px;background:var(--surface-3);padding:1px 5px;border-radius:5px}
+.md pre{font-family:var(--font-mono);font-size:12px;background:var(--surface-3);padding:10px 12px;border-radius:8px;overflow:auto;white-space:pre-wrap}
+.md ul{margin:6px 0;padding-left:20px} .md a{color:var(--accent)}
+textarea.md-edit{width:100%;min-height:160px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:8px;color:var(--text-1);font-family:var(--font-mono);font-size:12.5px;padding:10px;resize:vertical;line-height:1.5}
+.todo{display:flex;align-items:center;gap:9px;padding:6px 4px;border-radius:6px} .todo:hover{background:var(--surface-2)}
+.cb{width:17px;height:17px;border-radius:5px;border:1.6px solid var(--border-2);flex:0 0 auto;display:grid;place-items:center;cursor:pointer;color:transparent}
+.cb.on{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.star{cursor:pointer;color:var(--text-3);display:grid;place-items:center;width:22px;height:22px;border-radius:6px} .star.on{color:var(--warn)} .star:hover{background:var(--surface-3)}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.calcell{background:var(--surface-1);min-height:88px;padding:6px;display:flex;flex-direction:column;gap:4px}
+.caldow{background:var(--surface-1);padding:7px 6px;text-align:center}
+.kpi{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--r-lg);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.themebtn{position:fixed;top:14px;right:16px;z-index:80}
+</style>
+</head>
+<body>
+<div class="tt" id="root" style="width:100%;height:100vh;display:flex;overflow:hidden">
+  <aside class="tt-sidenav">
+    <div class="tt-sidenav-inner">
+      <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 16px">
+        <span style="width:24px;height:24px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:0 0 auto">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        </span>
+        <span class="tt-brandname" style="font-weight:600;font-size:15px;letter-spacing:-.02em">Timetrack</span>
+      </div>
+      <div id="nav"></div>
+      <div style="flex:1"></div>
+      <div class="tt-nav"><svg class="tt-navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.5M12 19v2.5M4.2 7l2.1 1.3M17.7 15.7l2.1 1.3M19.8 7l-2.1 1.3M6.3 15.7L4.2 17M2.5 12H5M19 12h2.5"/></svg><span class="tt-navlabel">Ajustes</span></div>
+    </div>
+  </aside>
+  <main id="main" style="flex:1;min-width:0;display:flex;flex-direction:column;padding:24px;gap:16px;overflow:auto"></main>
+</div>
+<div id="overlay"></div>
+<button class="tt-btn" style="position:fixed;top:14px;right:84px;z-index:80" onclick="openSpotlight()">⌘K</button>
+<button class="tt-btn themebtn" onclick="toggleTheme()">Tema</button>
+
+<script>
+// ============================================================
+//  RASCUNHO — aba de Projeto estilo Notion/Linear (em memória)
+// ============================================================
+const SV=(p,s=14,sw=1.7,st='')=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="${st}">${p}</svg>`;
+const I={
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  today:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',
+  chart:'<path d="M4 20V4M4 20h16M8 16v-4M12.5 16V9M17 16v-7"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M17 19a5.5 5.5 0 0 0-2.2-4.4"/>',
+  focus:'<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><circle cx="12" cy="12" r="2.5"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M3 12h18"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>',
+  check:'<path d="M4.5 12.5l5 5 10-11"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  play:'<path d="M7 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>',
+  star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8-4.3-4.1 5.9-.9z" fill="currentColor" stroke="none"/>',
+  starO:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8-4.3-4.1 5.9-.9z"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6M9 9h2"/>',
+  note:'<path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h3"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  list:'<path d="M8 6h12M8 12h12M8 18h12M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+  board:'<rect x="3.5" y="4" width="7" height="16" rx="1.5"/><rect x="13.5" y="4" width="7" height="10" rx="1.5"/>',
+  table:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-5"/>',
+  dots:'<circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
+  bolt:'<path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12z"/>',
+  expand:'<path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4"/>',
+  collapse:'<path d="M5 9h4V5M19 9h-4V5M5 15h4v4M19 15h-4v4"/>',
+  notion:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8.5 16.5V7.5l7 9v-9"/>',
+  ext:'<path d="M14 5h5v5M19 5l-8 8M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>',
+};
+const navIcon=n=>`<svg class="tt-navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+document.getElementById('nav').innerHTML=[
+  ['Hoje','today',0],['Calendário','cal',0],['Projetos','folder',1],['Clientes','briefcase',0],
+  ['Relatórios','chart',0],['Workspace','users',0],['Foco','focus',0],
+].map(([l,ic,a])=>`<div class="tt-nav" aria-current="${!!a}">${navIcon(ic)}<span class="tt-navlabel">${l}</span></div>`).join('');
+
+const STATUS={backlog:{label:'Backlog',color:'var(--text-3)'},todo:{label:'To do',color:'var(--text-2)'},doing:{label:'In progress',color:'var(--accent)'},done:{label:'Done',color:'var(--p-primor)'}};
+const ORDER=['backlog','todo','doing','done'];
+function statusIcon(k,s=15){
+  const c=STATUS[k].color;
+  if(k==='done')return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" style="color:${c}"><circle cx="12" cy="12" r="9" fill="currentColor"/><path d="M8 12.3l2.6 2.6 5.2-5.6" fill="none" stroke="var(--surface-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if(k==='doing')return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" style="color:${c}"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 5a7 7 0 0 1 0 14z" fill="currentColor"/></svg>`;
+  const dash=k==='backlog'?'stroke-dasharray="2.4 2.8"':'';
+  return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" style="color:${c}"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2" ${dash}/></svg>`;
+}
+const PRIO=['No priority','Low','Medium','High'];
+function prioIcon(p,s=14){const bar=(x,h,on)=>`<rect x="${x}" y="${20-h}" width="3.4" height="${h}" rx="1" fill="currentColor" opacity="${on?1:.28}"/>`;
+  return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" style="color:${p>=3?'var(--warn)':'var(--text-2)'}">${bar(4,6,p>=1)}${bar(10.3,10,p>=2)}${bar(16.6,14,p>=3)}</svg>`;}
+function prioPill(p){if(!p)return '';const c=p>=3?'var(--warn)':'var(--text-2)';return `<span class="chip" style="color:${c};gap:5px">${prioIcon(p,12)}${PRIO[p]}</span>`;}
+
+function md(src){
+  let h=(src||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/```([\s\S]*?)```/g,(m,c)=>`<pre>${c.trim()}</pre>`);
+  h=h.replace(/^### (.*)$/gm,'<h4>$1</h4>').replace(/^## (.*)$/gm,'<h3>$1</h3>').replace(/^# (.*)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\*)(.+?)\*/g,'$1<i>$2</i>').replace(/`(.+?)`/g,'<code>$1</code>');
+  h=h.replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>');
+  h=h.replace(/(?:^- .*(?:\n|$))+/gm,b=>'<ul>'+b.trim().split('\n').map(l=>`<li>${l.replace(/^- /,'')}</li>`).join('')+'</ul>');
+  h=h.replace(/\n{2,}/g,'<br><br>').replace(/(?<!>)\n(?!<)/g,'<br>');
+  return h;
+}
+
+// ---- dados ----
+const PROJECTS=[
+  {id:'lh',name:'Acme',client:'Acme',color:'var(--p-acme)',goal:18,tracked:511200},
+  {id:'la',name:'Lauda',   client:'Lauda',   color:'var(--p-lauda)',   goal:12,tracked:316800},
+  {id:'ak',name:'Arkan',   client:'Arkan',   color:'var(--p-arkan)',   goal:8, tracked:129600},
+  {id:'pr',name:'Primor',  client:'Primor Labs',color:'var(--p-primor)',goal:14,tracked:230400},
+  {id:'fr',name:'Freela',  client:'Avulso',  color:'var(--p-freela)',  goal:null,tracked:75600},
+];
+const BY=Object.fromEntries(PROJECTS.map(p=>[p.id,p]));
+let nextId=100; const uid=()=>'x'+(nextId++);
+const DATA={
+  lh:{objectives:[{id:'lh-o1',name:'Roadmap Q3',goal_hours:40},{id:'lh-o2',name:'Saúde do produto',goal_hours:null}],
+    tasks:[
+      {id:'lh-t1',name:'Fechar OKRs do trimestre',obj:'lh-o1',status:'doing',prio:3,due:'2025-06-25',tracked:7200,notion:'https://www.notion.so/OKRs-Q3-2025-8f3a1c9b',desc:'## Contexto\nAlinhar **3 OKRs** com a liderança.\n\nDoc completo na página do Notion ↗\n\n- Receita\n- Ativação\n- Retenção',todos:[{id:'d1',t:'Rascunho dos objetivos',done:true,goal:true},{id:'d2',t:'Revisar com o Carlos',done:false,goal:true},{id:'d3',t:'Publicar',done:false,goal:false}]},
+      {id:'lh-t2',name:'Sprint review + roadmap',obj:'lh-o1',status:'done',prio:2,due:'2025-06-20',tracked:3540,desc:'Apresentação da sprint.',todos:[{id:'d4',t:'Slides',done:true,goal:false}]},
+      {id:'lh-t3',name:'Call cliente — escopo Q3',obj:'lh-o1',status:'todo',prio:2,due:'2025-06-28',tracked:0,desc:'',todos:[]},
+      {id:'lh-t4',name:'Investigar churn de junho',obj:'lh-o2',status:'backlog',prio:1,due:null,tracked:0,desc:'Hipótese: onboarding confuso.',todos:[{id:'d5',t:'Puxar dados',done:false,goal:false}]},
+      {id:'lh-t5',name:'Ideia: dashboard de NPS',obj:null,status:'backlog',prio:0,due:null,tracked:0,desc:'Anotação solta.',todos:[]},
+      {id:'lh-t6',name:'Daily standup',obj:null,status:'todo',prio:0,due:null,tracked:1200,desc:'',todos:[]},
+    ],
+    notes:[
+      {id:'lh-n1',title:'Decisões de produto',updated:'há 2 dias',body:'# Decisões\n\n- **Cobrança anual** vira default.\n- Onboarding em 3 passos.\n\n## Aberto\n- Precificação enterprise (`?`)'},
+      {id:'lh-n2',title:'Notas da call com Marina',updated:'ontem',body:'Pediu relatório semanal por email.\n\n- [ ] mandar resumo\n- [x] agendar follow-up'},
+    ]},
+  la:{objectives:[{id:'la-o1',name:'Revisão de laudas',goal_hours:30}],
+    tasks:[
+      {id:'la-t1',name:'Revisão — lote 14',obj:'la-o1',status:'done',prio:2,due:'2025-06-18',tracked:5280,desc:'',todos:[]},
+      {id:'la-t2',name:'Revisão — lote 15',obj:'la-o1',status:'doing',prio:3,due:'2025-06-24',tracked:3600,desc:'Lote grande.',todos:[{id:'e1',t:'Triagem',done:true,goal:false},{id:'e2',t:'Revisar 20 laudas',done:false,goal:true}]},
+      {id:'la-t3',name:'Sync laudas',obj:null,status:'todo',prio:1,due:null,tracked:0,desc:'',todos:[]},
+    ],notes:[{id:'la-n1',title:'Padrão de revisão',updated:'há 5 dias',body:'## Checklist\n- Conferir CID\n- Conferir assinatura\n- Conferir data'}]},
+  ak:{objectives:[{id:'ak-o1',name:'API de tokens',goal_hours:12}],
+    tasks:[{id:'ak-t1',name:'Endpoint de tokens',obj:'ak-o1',status:'done',prio:2,due:null,tracked:6000,desc:'',todos:[]},{id:'ak-t2',name:'Testes do endpoint',obj:'ak-o1',status:'done',prio:1,due:null,tracked:4200,desc:'',todos:[]}],notes:[]},
+  pr:{objectives:[{id:'pr-o1',name:'PrimaOS — infra',goal_hours:20}],
+    tasks:[{id:'pr-t1',name:'Deploy Caddy',obj:'pr-o1',status:'doing',prio:3,due:'2025-06-23',tracked:1900,desc:'',todos:[{id:'f1',t:'vhost',done:true,goal:false},{id:'f2',t:'TLS',done:false,goal:true}]},{id:'pr-t2',name:'Backup automatizado',obj:null,status:'backlog',prio:1,due:null,tracked:0,desc:'',todos:[]}],notes:[]},
+  fr:{objectives:[],tasks:[{id:'fr-t1',name:'Landing — hero',obj:null,status:'doing',prio:2,due:'2025-06-26',tracked:5070,desc:'Copy + animação.',todos:[]},{id:'fr-t2',name:'Ajustes finais',obj:null,status:'todo',prio:1,due:null,tracked:0,desc:'',todos:[]}],notes:[]},
+};
+
+const fmtH=sec=>{const s=Math.max(0,Math.floor(sec));return `${Math.floor(s/3600)}h${String(Math.floor((s%3600)/60)).padStart(2,'0')}`;};
+const dataBr=iso=>iso.split('-').reverse().join('/');
+function notionTitle(url){try{let s=url.split('?')[0].split('#')[0].replace(/\/$/,'').split('/').pop();s=decodeURIComponent(s).replace(/-[0-9a-fA-F]{6,}$/,'').replace(/-/g,' ').trim();return s||'Página do Notion';}catch(e){return 'Página do Notion';}}
+const notionMark=s=>`<span style="width:${s}px;height:${s}px;border-radius:6px;background:#fff;color:#111;display:grid;place-items:center;font-weight:800;font-size:${Math.round(s*0.6)}px;flex:0 0 auto;font-family:Georgia,'Times New Roman',serif;line-height:1">N</span>`;
+const findTask=id=>{for(const p in DATA){const t=DATA[p].tasks.find(t=>t.id===id);if(t)return t;}return null;};
+const findNote=id=>{for(const p in DATA){const n=DATA[p].notes.find(n=>n.id===id);if(n)return n;}return null;};
+function objStats(pid,oid){const ts=DATA[pid].tasks.filter(t=>t.obj===oid);const done=ts.filter(t=>t.status==='done').length;return {n:ts.length,done,pct:ts.length?Math.round(done/ts.length*100):0,tracked:ts.reduce((s,t)=>s+t.tracked,0)};}
+
+const S={
+  route:'list', tab:'overview',
+  taskView:localStorage.getItem('pw.taskview')||'board',
+  notaView:localStorage.getItem('pw.notaview')||'cards',
+  metaView:localStorage.getItem('pw.metaview')||'cards',
+  panel:null, panelEdit:false, panelMode:'side', cal:{y:2025,m:5},
+};
+const go=r=>{S.route=r;S.tab='overview';S.panel=null;render();};
+let dragId=null;
+
+// ============================================================ lista
+function renderList(){
+  const card=p=>{const n=DATA[p.id].tasks.length;const open=DATA[p.id].tasks.filter(t=>t.status!=='done').length;
+    return `<div class="tt-card" style="padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--surface-1);cursor:pointer" onclick="go({pid:'${p.id}'})">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="width:4px;height:30px;border-radius:3px;background:${p.color};flex:0 0 auto;margin-top:2px"></span>
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">${p.name}</div>
+        <div class="faint" style="font-size:11.5px;margin-top:1px">${open} pendente${open===1?'':'s'} · ${n} no total</div></div>
+        <span class="chip"><i class="tt-dot" style="width:6px;height:6px;background:var(--accent)"></i>Ativo</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2)">${SV(I.briefcase,14,1.7,'color:var(--text-3)')}${p.client}</div></div>`;};
+  return `<div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div><p class="eyebrow" style="margin:0">${PROJECTS.length} projetos · ${new Set(PROJECTS.map(p=>p.client)).size} clientes</p>
+      <h1 style="margin:4px 0 0;font-size:26px;font-weight:600;letter-spacing:-.02em">Projetos</h1></div>
+      <button class="tt-btn tt-btn--accent">${SV(I.plus,15,2.2)}Novo projeto</button></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px;align-content:start">${PROJECTS.map(card).join('')}</div>`;
+}
+
+// ============================================================ projeto (abas)
+function renderProject(pid){
+  const p=BY[pid];
+  const back=`<a href="#" class="tt-btn tt-btn--ghost tt-btn--sm" onclick="event.preventDefault();go('list')" style="align-self:flex-start;text-decoration:none">${SV(I.chev,14,1.7,'transform:rotate(90deg)')}Projetos</a>`;
+  const tab=(k,label,icon)=>`<div class="tab" aria-selected="${S.tab===k}" onclick="S.tab='${k}';S.panel=null;render()">${SV(I[icon],15)}${label}</div>`;
+  const open=DATA[pid].tasks.filter(t=>t.status!=='done').length;
+  let body= S.tab==='overview'?renderOverview(pid): S.tab==='tasks'?renderTasks(pid): S.tab==='notas'?renderNotas(pid): S.tab==='metas'?renderMetas(pid): renderCal(pid);
+  return `<div style="display:flex;flex-direction:column;gap:10px">
+    ${back}
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <span style="width:5px;height:28px;border-radius:3px;background:${p.color};flex:0 0 auto"></span>
+      <h1 style="margin:0;font-size:23px;font-weight:600;letter-spacing:-.02em">${p.name}</h1>
+      <span class="chip" style="margin-left:2px">${p.client}</span>
+      <span class="faint" style="font-size:12.5px">${open} open</span>
+    </div>
+    <div class="tabs">${tab('overview','Overview','gauge')}${tab('tasks','Tasks','board')}${tab('notas','Notes','note')}${tab('metas','Goals','star')}${tab('cal','Calendar','cal')}</div>
+  </div>${body}`;
+}
+
+// ---- OVERVIEW (dashboard) ----
+function renderOverview(pid){
+  const p=BY[pid], d=DATA[pid];
+  const total=d.tasks.length;
+  const counts=Object.fromEntries(ORDER.map(k=>[k,d.tasks.filter(t=>t.status===k).length]));
+  const open=d.tasks.filter(t=>t.status!=='done').length;
+  const donePct=total?Math.round(counts.done/total*100):0;
+  const next=d.tasks.filter(t=>t.due&&t.status!=='done').sort((a,b)=>a.due<b.due?-1:1).slice(0,5);
+
+  const kpi=(label,val,sub='')=>`<div class="kpi"><span class="eyebrow">${label}</span><span class="mono" style="font-size:24px;font-weight:600;line-height:1.1">${val}</span><span class="faint" style="font-size:11.5px">${sub||'&nbsp;'}</span></div>`;
+
+  const card=(title,link,inner)=>`<div class="tt-card" style="background:var(--surface-1);padding:18px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow">${title}</span>${link||''}</div>${inner}</div>`;
+
+  const nextRow=t=>`<div class="trow" onclick="openTask('${t.id}')">${statusIcon(t.status,15)}${prioIcon(t.prio,13)}
+    <span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</span>
+    <span class="chip mono" style="font-size:11px">${dataBr(t.due)}</span></div>`;
+  const upcoming=card('Upcoming',
+    `<a href="#" class="faint" style="font-size:12px;text-decoration:none" onclick="event.preventDefault();S.tab='cal';render()">Calendar →</a>`,
+    next.length?`<div style="display:flex;flex-direction:column;gap:2px">${next.map(nextRow).join('')}</div>`:'<span class="faint" style="font-size:12.5px">No deadlines set.</span>');
+
+  const notesCard=card('Recent notes',
+    `<a href="#" class="faint" style="font-size:12px;text-decoration:none" onclick="event.preventDefault();S.tab='notas';render()">Notes →</a>`,
+    d.notes.length?`<div style="display:flex;flex-direction:column;gap:2px">${d.notes.slice(0,3).map(n=>`<div class="trow" onclick="openNote('${n.id}')">${SV(I.doc,15,1.7,'color:var(--text-3)')}<span style="flex:1;font-size:13px">${n.title}</span><span class="faint" style="font-size:11.5px">${n.updated}</span></div>`).join('')}</div>`:'<span class="faint" style="font-size:12.5px">No notes yet.</span>');
+
+  const statusRow=k=>{const c=counts[k],pct=total?Math.round(c/total*100):0;
+    return `<div style="display:flex;align-items:center;gap:10px">${statusIcon(k,14)}
+      <span style="font-size:12.5px;width:88px;flex:0 0 auto">${STATUS[k].label}</span>
+      <div class="tt-goal" style="flex:1"><i style="width:${pct}%;background:${k==='done'?'var(--accent)':(STATUS[k].color==='var(--text-3)'?'var(--text-2)':STATUS[k].color)}"></i></div>
+      <span class="mono faint" style="font-size:11.5px;width:18px;text-align:right">${c}</span></div>`;};
+  const goalRow=o=>{const st=objStats(pid,o.id);
+    return `<div style="display:flex;align-items:center;gap:10px">${SV(I.star,13,1.7,'color:var(--warn)')}
+      <span style="font-size:12.5px;width:88px;flex:0 0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.name}</span>
+      <div class="tt-goal" style="flex:1"><i style="width:${st.pct}%;background:${st.pct>=100?'var(--accent)':p.color}"></i></div>
+      <span class="mono faint" style="font-size:11.5px;width:32px;text-align:right">${st.pct}%</span></div>`;};
+  const progress=`<div class="tt-card" style="background:var(--surface-1);padding:18px;display:flex;flex-direction:column;gap:14px">
+    <span class="eyebrow">Progress</span>
+    <div style="display:flex;flex-direction:column;gap:9px">${ORDER.map(statusRow).join('')}</div>
+    ${d.objectives.length?`<div style="border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:10px"><span class="eyebrow">Goals</span>${d.objectives.map(goalRow).join('')}</div>`:''}
+  </div>`;
+
+  return `<div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+      ${kpi('Total time',fmtH(p.tracked))}
+      ${kpi('This week','0h00', p.goal?`goal ${p.goal}h`:'')}
+      ${kpi('Open',open,`${counts.backlog} in backlog`)}
+      ${kpi('Done',donePct+'%',`${counts.done}/${total} tasks`)}
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:14px">${upcoming}${notesCard}</div>
+      ${progress}
+    </div></div>`;
+}
+
+// ---- TASKS ----
+function setTaskView(v){S.taskView=v;localStorage.setItem('pw.taskview',v);render();}
+function taskCardMeta(t){
+  const todos=t.todos.length,tdone=t.todos.filter(x=>x.done).length,goals=t.todos.filter(x=>x.goal).length,gdone=t.todos.filter(x=>x.goal&&x.done).length;
+  const m=[];
+  if(t.due)m.push(`<span class="mono faint" style="font-size:11px">${SV(I.cal,11,1.7,'vertical-align:-1px')} ${dataBr(t.due)}</span>`);
+  if(todos)m.push(`<span class="faint" style="font-size:11px">${SV(I.check,11,2)} ${tdone}/${todos}</span>`);
+  if(goals)m.push(`<span style="font-size:11px;color:var(--warn)">${SV(I.star,11)} ${gdone}/${goals}</span>`);
+  if(t.tracked)m.push(`<span class="mono faint" style="font-size:11px">${fmtH(t.tracked)}</span>`);
+  if(t.notion)m.push(`<span class="faint" title="tem página no Notion" style="font-size:11px;display:inline-flex">${SV(I.notion,12)}</span>`);
+  return m;
+}
+function taskCard(t){
+  const m=taskCardMeta(t);
+  return `<div class="tcard" draggable="true" ondragstart="dragId='${t.id}';this.classList.add('drag')" ondragend="this.classList.remove('drag')" onclick="openTask('${t.id}')">
+    <div style="display:flex;align-items:flex-start;gap:8px">
+      <span style="flex:1;font-size:13px;font-weight:500;line-height:1.35">${t.name}</span>
+      ${t.prio?prioIcon(t.prio,14):''}
+    </div>
+    ${m.length?`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${m.join('')}</div>`:''}
+  </div>`;
+}
+function renderTasks(pid){
+  const tasks=DATA[pid].tasks;
+  const toolbar=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <div class="seg">
+      <button aria-pressed="${S.taskView==='board'}" onclick="setTaskView('board')">${SV(I.board,14)}Board</button>
+      <button aria-pressed="${S.taskView==='list'}" onclick="setTaskView('list')">${SV(I.list,14)}List</button>
+      <button aria-pressed="${S.taskView==='table'}" onclick="setTaskView('table')">${SV(I.table,14)}Table</button>
+    </div>
+    <button class="tt-btn tt-btn--accent" onclick="newTask('${pid}','todo')">${SV(I.plus,15,2.2)}New task</button>
+  </div>`;
+
+  if(S.taskView==='board'){
+    const col=k=>{const ts=tasks.filter(t=>t.status===k);
+      return `<div class="col" data-over="false" ondragover="event.preventDefault();this.dataset.over='true'" ondragleave="this.dataset.over='false'" ondrop="this.dataset.over='false';dropStatus('${k}')">
+        <div style="display:flex;align-items:center;gap:8px;padding:2px 2px 2px">${statusIcon(k,15)}<span style="font-size:12.5px;font-weight:600">${STATUS[k].label}</span><span class="mono faint" style="font-size:11.5px">${ts.length}</span></div>
+        ${ts.map(taskCard).join('')}
+        <div class="quickadd" onclick="newTask('${pid}','${k}')">${SV(I.plus,13,2)}<span>Add</span></div>
+      </div>`;};
+    return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}
+      <p class="faint" style="margin:0;font-size:11.5px">Drag cards between columns to change status ↔</p>
+      <div class="board-cols">${ORDER.map(col).join('')}</div></div>`;
+  }
+  if(S.taskView==='table'){
+    const row=t=>{const todos=t.todos.length,tdone=t.todos.filter(x=>x.done).length;
+      return `<tr onclick="openTask('${t.id}')">
+        <td style="width:30px" onclick="event.stopPropagation();cycleStatus('${t.id}')" title="mudar status">${statusIcon(t.status,16)}</td>
+        <td style="font-weight:500">${t.name}</td>
+        <td onclick="event.stopPropagation();cyclePrio('${t.id}')" title="mudar prioridade" style="white-space:nowrap">${t.prio?`${prioIcon(t.prio,13)} <span class="faint" style="font-size:12px">${PRIO[t.prio]}</span>`:'<span class="faint">—</span>'}</td>
+        <td class="mono faint" style="font-size:12px">${t.due?dataBr(t.due):'—'}</td>
+        <td class="faint" style="font-size:12px">${todos?`${tdone}/${todos}`:'—'}</td>
+        <td class="num faint" style="font-size:12px">${t.tracked?fmtH(t.tracked):'—'}</td>
+      </tr>`;};
+    return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}
+      <div class="tt-panel" style="border-radius:var(--r-lg);overflow:auto">
+        <table class="ntable"><thead><tr><th></th><th>Task</th><th>Priority</th><th>Due</th><th>To-dos</th><th class="num">Time</th></tr></thead>
+        <tbody>${tasks.map(row).join('')}</tbody></table></div>
+      <div class="quickadd" style="max-width:240px" onclick="newTask('${pid}','todo')">${SV(I.plus,13,2)}<span>New task</span></div></div>`;
+  }
+  // lista agrupada
+  const group=k=>{const ts=tasks.filter(t=>t.status===k);if(!ts.length&&k!=='todo')return '';
+    const row=t=>{const todos=t.todos.length,tdone=t.todos.filter(x=>x.done).length,goals=t.todos.filter(x=>x.goal).length;
+      return `<div class="trow" onclick="openTask('${t.id}')">
+        <span onclick="event.stopPropagation();cycleStatus('${t.id}')" style="cursor:pointer;display:flex">${statusIcon(t.status,16)}</span>
+        ${prioIcon(t.prio,14)}
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;${t.status==='done'?'color:var(--text-3);text-decoration:line-through':''}">${t.name}</span>
+        ${goals?`<span style="font-size:11px;color:var(--warn);white-space:nowrap">${SV(I.star,11)} ${goals}</span>`:''}
+        ${todos?`<span class="faint" style="font-size:11px;white-space:nowrap">${tdone}/${todos}</span>`:''}
+        ${t.due?`<span class="mono faint" style="font-size:11.5px;white-space:nowrap">${dataBr(t.due)}</span>`:''}
+        ${t.tracked?`<span class="mono faint" style="font-size:11.5px;white-space:nowrap">${fmtH(t.tracked)}</span>`:''}
+      </div>`;};
+    return `<div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 8px">${statusIcon(k,14)}<span class="eyebrow" style="letter-spacing:.08em">${STATUS[k].label}</span><span class="mono faint" style="font-size:11px">${ts.length}</span></div>
+      ${ts.map(row).join('')}
+      <div class="quickadd" style="margin:4px 0 0" onclick="newTask('${pid}','${k}')">${SV(I.plus,13,2)}<span>Add task</span></div></div>`;};
+  return `<div style="display:flex;flex-direction:column;gap:8px">${toolbar}${ORDER.map(group).join('')}</div>`;
+}
+
+// ---- NOTES (lista Notion) ----
+function renderNotas(pid){
+  const notes=DATA[pid].notes;
+  const toolbar=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <p class="faint" style="margin:0;font-size:12.5px">Markdown notes — stored as <span class="mono" style="color:var(--text-1)">.md</span> in Postgres</p>
+    <button class="tt-btn tt-btn--accent" onclick="newNote('${pid}')">${SV(I.plus,15,2.2)}New note</button></div>`;
+  if(!notes.length) return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}<p class="faint">No notes yet.</p></div>`;
+  const body=`<div class="tt-panel" style="border-radius:var(--r-lg);overflow:auto"><table class="ntable">
+    <thead><tr><th></th><th>Note</th><th>Preview</th><th>Updated</th></tr></thead>
+    <tbody>${notes.map(n=>`<tr onclick="openNote('${n.id}')">
+      <td style="width:28px;color:var(--text-3)">${SV(I.doc,15)}</td>
+      <td style="font-weight:540;white-space:nowrap">${n.title} <span class="chip" style="font-size:9.5px">.md</span></td>
+      <td class="faint" style="font-size:12px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${md(n.body).replace(/<[^>]+>/g,' ').slice(0,100)}</td>
+      <td class="faint" style="font-size:12px;white-space:nowrap">${n.updated}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}${body}</div>`;
+}
+
+// ---- GOALS (lista Notion) ----
+function renderMetas(pid){
+  const objs=DATA[pid].objectives, p=BY[pid];
+  const toolbar=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <p class="faint" style="margin:0;font-size:12px">Progress by tasks and/or hours. Soon: <span class="mono" style="color:var(--text-1)">/goal</span> command, cross-project.</p>
+    <button class="tt-btn tt-btn--accent" onclick="alert('mock: would create a goal')">${SV(I.plus,15,2.2)}New goal</button></div>`;
+  if(!objs.length) return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}<p class="faint">No goals yet.</p></div>`;
+  const body=`<div class="tt-panel" style="border-radius:var(--r-lg);overflow:auto"><table class="ntable">
+    <thead><tr><th></th><th>Goal</th><th style="width:200px">Progress</th><th class="num">Tasks</th><th class="num">Hours</th><th>Status</th></tr></thead>
+    <tbody>${objs.map(o=>{const st=objStats(pid,o.id);return `<tr>
+      <td style="width:26px;color:var(--warn)">${SV(I.star,15)}</td>
+      <td style="font-weight:540;white-space:nowrap">${o.name}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="tt-goal" style="flex:1"><i style="width:${st.pct}%;background:${st.pct>=100?'var(--accent)':p.color}"></i></div><span class="mono faint" style="font-size:11.5px">${st.pct}%</span></div></td>
+      <td class="num faint" style="font-size:12px">${st.done}/${st.n}</td>
+      <td class="num faint" style="font-size:12px">${o.goal_hours?`${fmtH(st.tracked)}/${o.goal_hours}h`:fmtH(st.tracked)}</td>
+      <td>${st.pct>=100?`<span class="chip" style="color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)">${SV(I.check,12,2.4)} Done</span>`:'<span class="chip">Open</span>'}</td></tr>`;}).join('')}</tbody></table></div>`;
+  return `<div style="display:flex;flex-direction:column;gap:14px">${toolbar}${body}</div>`;
+}
+
+// ---- CALENDÁRIO ----
+function renderCal(pid){
+  const {y,m}=S.cal;const monthName=new Date(y,m,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1),startDow=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+  const dueOf=d=>{const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return DATA[pid].tasks.filter(t=>t.due===iso);};
+  const dows=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d=>`<div class="caldow eyebrow">${d}</div>`).join('');
+  let cells='';for(let i=0;i<startDow;i++)cells+=`<div class="calcell" style="background:var(--surface-2)"></div>`;
+  for(let d=1;d<=days;d++){const due=dueOf(d);
+    cells+=`<div class="calcell"><span class="mono faint" style="font-size:11px">${d}</span>${due.map(t=>`<div onclick="openTask('${t.id}')" style="cursor:pointer;font-size:10.5px;padding:2px 6px;border-radius:5px;background:var(--accent-soft);color:var(--text-1);border-left:2px solid ${BY[pid].color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>`).join('')}</div>`;}
+  return `<div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="tt-btn tt-btn--ghost tt-btn--sm" onclick="calMove(-1)">${SV(I.chev,15,1.7,'transform:rotate(90deg)')}</button>
+        <span style="font-size:15px;font-weight:600;text-transform:capitalize;min-width:150px;text-align:center">${monthName}</span>
+        <button class="tt-btn tt-btn--ghost tt-btn--sm" onclick="calMove(1)">${SV(I.chev,15,1.7,'transform:rotate(-90deg)')}</button>
+      </div>
+      <span class="chip">${SV(I.cal,12)} Deadlines deste projeto</span></div>
+    <div class="calgrid">${dows}${cells}</div>
+    <p class="faint" style="margin:0;font-size:12px">Rascunho — calendário do projeto; depois casa com o Google Calendar.</p></div>`;
+}
+
+// ============================================================ painel
+function renderOverlay(){const ov=document.getElementById('overlay');if(!S.panel){ov.innerHTML='';return;}
+  if(S.panel.type==='task')ov.innerHTML=taskPanel(findTask(S.panel.id));
+  else if(S.panel.type==='note')ov.innerHTML=notePanel(findNote(S.panel.id));
+  else if(S.panel.type==='spotlight')ov.innerHTML=spotlightPanel();}
+function panelChrome(chip,body){
+  const exp=`<button class="tt-btn tt-btn--ghost tt-btn--sm" title="${S.panelMode==='full'?'Sair da tela cheia':'Tela cheia'}" onclick="togglePanelMode()">${SV(S.panelMode==='full'?I.collapse:I.expand,15)}</button>`;
+  const header=`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);flex:0 0 auto">
+    <span class="chip">${chip}</span>
+    <div style="display:flex;gap:6px">${exp}<button class="tt-btn tt-btn--ghost tt-btn--sm" onclick="closePanel()">${SV(I.x,15)}</button></div></div>`;
+  const content=`<div class="modalcontent">${body}</div>`;
+  if(S.panelMode==='full') return `<div class="full">${header}${content}</div>`;
+  return `<div class="mscrim" onclick="closePanel()"></div><div class="mwrap"><div class="mcard">${header}${content}</div></div>`;
+}
+function taskPanel(t){if(!t)return '';
+  const goals=t.todos.filter(x=>x.goal).length,gdone=t.todos.filter(x=>x.goal&&x.done).length,tdone=t.todos.filter(x=>x.done).length;
+  const todoRow=x=>`<div class="todo"><span class="cb ${x.done?'on':''}" onclick="toggleTodo('${t.id}','${x.id}')">${SV(I.check,12,2.6)}</span>
+    <span style="flex:1;font-size:13px;${x.done?'color:var(--text-3);text-decoration:line-through':''}">${x.t}</span>
+    <span class="star ${x.goal?'on':'empty'}" title="mark as goal" onclick="toggleGoal('${t.id}','${x.id}')">${SV(x.goal?I.star:I.starO,14)}</span></div>`;
+  const prop=(icon,name,val)=>`<div class="prop"><div class="prop-k">${icon}<span>${name}</span></div><div class="prop-v">${val}</div></div>`;
+  const statusVal=`<span class="chip" style="cursor:pointer" onclick="cycleStatus('${t.id}')">${statusIcon(t.status,13)} ${STATUS[t.status].label}</span>`;
+  const prioVal=`<span class="chip" style="cursor:pointer" onclick="cyclePrio('${t.id}')">${t.prio?`${prioIcon(t.prio,12)} ${PRIO[t.prio]}`:'<span class="faint">No priority</span>'}</span>`;
+  const dueVal=`<input type="date" value="${t.due||''}" oninput="findTask('${t.id}').due=this.value||null;render()" style="background:var(--surface-2);border:1px solid var(--border-2);border-radius:7px;color:var(--text-1);font:inherit;font-size:12.5px;padding:4px 8px"/>`;
+  const timeVal=`<span class="mono" style="font-size:13px">${fmtH(t.tracked)}</span><button class="tt-btn tt-btn--accent tt-btn--sm" style="margin-left:auto" onclick="alert('mock: would start tracking this task')">${SV(I.play,12)}Start</button>`;
+  const customRows=(t.props||[]).map(p=>`<div class="prop">
+    <div class="prop-k">${SV(I.dots,13)}<input class="prop-name" value="${(p.name||'').replace(/"/g,'&quot;')}" oninput="setPropName('${t.id}','${p.id}',this.value)" placeholder="Property"/></div>
+    <div class="prop-v"><input class="prop-val" value="${(p.value||'').replace(/"/g,'&quot;')}" oninput="setPropVal('${t.id}','${p.id}',this.value)" placeholder="Empty"/>
+    <button class="iconx" title="remove" onclick="removeProp('${t.id}','${p.id}')">${SV(I.x,13)}</button></div></div>`).join('');
+  const notionVal=t.notion
+    ? `<a href="${t.notion}" target="_blank" class="tt-btn tt-btn--ghost tt-btn--sm" style="gap:6px;color:var(--text-1)">${SV(I.notion,13)} Open in Notion ${SV(I.ext,12,1.7,'color:var(--text-3)')}</a><button class="iconx" title="unlink" onclick="findTask('${t.id}').notion=null;render()">${SV(I.x,13)}</button>`
+    : `<input class="prop-val" value="" onchange="findTask('${t.id}').notion=this.value.trim()||null;render()" placeholder="Cole o link da página do Notion…"/>`;
+  const notionCard=t.notion
+    ? `<a href="${t.notion}" target="_blank" class="notion-card">
+        ${notionMark(30)}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${notionTitle(t.notion)}</div>
+          <div class="faint" style="font-size:11.5px;display:flex;align-items:center;gap:5px;margin-top:1px">${SV(I.notion,12)} notion.so · doc completa</div>
+        </div>${SV(I.ext,16,1.7,'color:var(--text-3)')}</a>`
+    : '';
+
+  const main=`<div class="taskmain">
+    <input id="taskTitle" value="${t.name.replace(/"/g,'&quot;')}" oninput="findTask('${t.id}').name=this.value" onkeydown="if(event.key==='Enter'){event.preventDefault();const d=document.getElementById('taskDesc');if(d){d.focus();const v=d.value.length;d.setSelectionRange(v,v);}}" placeholder="Untitled" style="background:transparent;border:none;outline:none;color:var(--text-1);font-family:var(--font-ui);font-size:30px;font-weight:700;letter-spacing:-.02em"/>
+    <div style="display:flex;flex-direction:column;gap:2px;padding:8px 0 12px;border-bottom:1px solid var(--border)">
+      ${prop(SV(I.board,13),'Status',statusVal)}
+      ${prop(prioIcon(2,13),'Priority',prioVal)}
+      ${prop(SV(I.cal,13),'Due',dueVal)}
+      ${prop(SV(I.clock,13),'Time',timeVal)}
+      ${prop(SV(I.notion,13),'Notion',notionVal)}
+      ${customRows}
+      <button class="tt-btn tt-btn--ghost tt-btn--sm" style="align-self:flex-start;margin-top:6px" onclick="addProp('${t.id}')">${SV(I.plus,13,2.2)}Add property</button>
+    </div>
+    ${notionCard}
+    <div style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <span class="eyebrow" style="margin-bottom:6px">Description</span>
+      <textarea id="taskDesc" class="noteedit" style="font-size:14px;min-height:120px;line-height:1.6" oninput="findTask('${t.id}').desc=this.value" placeholder="Escreva uma descrição rápida…  (a doc completa fica no Notion)">${(t.desc||'').replace(/<\/textarea>/g,'<\\/textarea>')}</textarea>
+    </div>
+  </div>`;
+  const aside=`<aside class="taskside">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span class="eyebrow">Sub-tasks</span><span class="mono faint" style="font-size:11px">${tdone}/${t.todos.length}</span></div>
+    ${goals?`<div style="font-size:11px;color:var(--warn);margin-bottom:2px">${SV(I.star,11)} ${gdone}/${goals} goals</div>`:''}
+    ${t.todos.map(todoRow).join('')||'<span class="faint" style="font-size:12px;padding:4px 0">No sub-tasks yet.</span>'}
+    <div class="todo"><span class="cb" style="opacity:.5">${SV(I.plus,12,2.4)}</span>
+      <input id="newtodo" placeholder="add item…  (⭐ = goal)" onkeydown="if(event.key==='Enter')addTodo('${t.id}',this.value),this.value=''" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text-1);font:inherit;font-size:13px"/></div>
+  </aside>`;
+  return panelChrome(`${statusIcon(t.status,13)} Task · <span class="mono">.md</span>`,main+aside);
+}
+function addProp(id){const t=findTask(id);(t.props=t.props||[]).push({id:uid(),name:'',value:''});render();}
+function removeProp(id,pid){const t=findTask(id);t.props=(t.props||[]).filter(p=>p.id!==pid);render();}
+function setPropName(id,pid,v){const p=(findTask(id).props||[]).find(p=>p.id===pid);if(p)p.name=v;}
+function setPropVal(id,pid,v){const p=(findTask(id).props||[]).find(p=>p.id===pid);if(p)p.value=v;}
+function notePanel(n){if(!n)return '';
+  const refs=(n.refs||[]).map(r=>{
+    if(r.type==='task'){const t=findTask(r.id);if(!t)return '';return `<span class="chip" style="cursor:pointer" onclick="openTask('${t.id}')">${statusIcon(t.status,12)} ${t.name}</span>`;}
+    const sn=findNote(r.id);if(!sn)return '';return `<span class="chip" style="cursor:pointer" onclick="openNote('${sn.id}')">${SV(I.doc,12)} ${sn.title}</span>`;
+  }).filter(Boolean).join('');
+  const body=`<div class="notemain">
+    <input value="${n.title.replace(/"/g,'&quot;')}" oninput="findNote('${n.id}').title=this.value" placeholder="Untitled" style="background:transparent;border:none;outline:none;color:var(--text-1);font-family:var(--font-ui);font-size:30px;font-weight:700;letter-spacing:-.02em"/>
+    ${refs?`<div style="display:flex;gap:6px;flex-wrap:wrap">${refs}</div>`:''}
+    <div style="position:relative;flex:1;min-height:0;display:flex">
+      <textarea id="noteEditor" class="noteedit" oninput="onNoteInput('${n.id}')" onkeydown="noteEditorKey(event)" placeholder="Write in Markdown…  press / for commands (Task, Note, To-do, Heading…)">${(n.body||'').replace(/<\/textarea>/g,'<\\/textarea>')}</textarea>
+      <div id="slashmenu" class="slashmenu"></div>
+    </div>
+  </div>`;
+  return panelChrome(`${SV(I.doc,13)} Note · <span class="mono">.md</span> · <span class="faint">type <span class="mono" style="color:var(--text-2)">/</span> for commands</span>`,body);
+}
+
+// ---- slash commands dentro da nota (cria tasks/sub-notas reais) ----
+const SLASH=[
+  {cmd:'task',label:'Task',desc:'Cria uma task ligada a esta nota',icon:'board'},
+  {cmd:'note',label:'Note',desc:'Cria uma sub-nota',icon:'doc'},
+  {cmd:'todo',label:'To-do',desc:'Item de checklist',icon:'check'},
+  {cmd:'h1',label:'Heading 1',desc:'Título de seção',icon:'list'},
+  {cmd:'h2',label:'Heading 2',desc:'Subtítulo',icon:'list'},
+  {cmd:'divider',label:'Divider',desc:'Linha separadora',icon:'list'},
+];
+let slashItems=[],slashNote=null,slashSel=0;
+function noteCtx(id){for(const p in DATA){const n=DATA[p].notes.find(n=>n.id===id);if(n)return {pid:p,n};}return null;}
+function onNoteInput(id){const el=document.getElementById('noteEditor');noteCtx(id).n.body=el.value;
+  const pos=el.selectionStart,val=el.value,ls=val.lastIndexOf('\n',pos-1)+1,seg=val.slice(ls,pos),m=seg.match(/\/(\w*)$/);
+  if(m)showSlash(id,m[1].toLowerCase());else hideSlash();}
+function showSlash(id,q){slashNote=id;slashItems=SLASH.filter(s=>!q||s.cmd.startsWith(q)||s.label.toLowerCase().startsWith(q));slashSel=0;
+  const menu=document.getElementById('slashmenu');if(!menu)return;if(!slashItems.length){hideSlash();return;}
+  menu.innerHTML=slashItems.map((s,i)=>`<div class="slashitem ${i===0?'sel':''}" onmousedown="event.preventDefault();applySlash('${s.cmd}')"><span style="color:var(--text-3)">${SV(I[s.icon],15)}</span><div style="flex:1"><div style="font-size:13px;font-weight:540">${s.label}</div><div class="faint" style="font-size:11px">${s.desc}</div></div></div>`).join('');
+  menu.style.display='block';}
+function hideSlash(){const m=document.getElementById('slashmenu');if(m)m.style.display='none';slashItems=[];}
+function noteEditorKey(e){const m=document.getElementById('slashmenu');if(!m||m.style.display!=='block')return;
+  if(e.key==='Escape'){e.preventDefault();hideSlash();}
+  else if(e.key==='Enter'){e.preventDefault();applySlash(slashItems[slashSel].cmd);}
+  else if(e.key==='ArrowDown'){e.preventDefault();slashSel=Math.min(slashSel+1,slashItems.length-1);[...m.children].forEach((el,i)=>el.classList.toggle('sel',i===slashSel));}
+  else if(e.key==='ArrowUp'){e.preventDefault();slashSel=Math.max(slashSel-1,0);[...m.children].forEach((el,i)=>el.classList.toggle('sel',i===slashSel));}}
+function applySlash(cmd){const id=slashNote,ctx=noteCtx(id),n=ctx.n,el=document.getElementById('noteEditor');
+  let val=el.value,pos=el.selectionStart,ls=val.lastIndexOf('\n',pos-1)+1,seg=val.slice(ls,pos),si=seg.lastIndexOf('/');
+  let cut=si>=0?ls+si:pos,before=val.slice(0,cut),after=val.slice(pos),insert='';
+  if(cmd==='h1')insert='# ';else if(cmd==='h2')insert='## ';else if(cmd==='todo')insert='- [ ] ';else if(cmd==='divider')insert='\n---\n';
+  else if(cmd==='task'){const t={id:uid(),name:'New task',obj:null,status:'backlog',prio:0,due:null,tracked:0,desc:'',todos:[]};DATA[ctx.pid].tasks.push(t);(n.refs=n.refs||[]).push({type:'task',id:t.id});insert='- [ ] New task';}
+  else if(cmd==='note'){const sn={id:uid(),title:'New note',updated:'now',body:'# New note\n\n'};DATA[ctx.pid].notes.push(sn);(n.refs=n.refs||[]).push({type:'note',id:sn.id});insert='[[New note]]';}
+  n.body=before+insert+after;hideSlash();render();
+  setTimeout(()=>{const e=document.getElementById('noteEditor');if(e){e.focus();const c=(before+insert).length;e.setSelectionRange(c,c);}},0);}
+
+// ---- Spotlight (Cmd+K) — no mesmo popup central ----
+const SPOT=[
+  {act:'task',label:'New task',desc:'/task — cria uma task neste projeto',icon:'board'},
+  {act:'note',label:'New note',desc:'/note — cria uma nota neste projeto',icon:'doc'},
+  {act:'timer',label:'Start timer',desc:'/timer — começa a cronometrar',icon:'play'},
+  {act:'goal',label:'New goal',desc:'/goal — cria uma meta',icon:'star'},
+];
+function spotPid(){return S.route&&S.route.pid?S.route.pid:'lh';}
+function openSpotlight(){S.spotQ='';S.panel={type:'spotlight'};render();setTimeout(()=>{const i=document.getElementById('spotInput');i&&i.focus();},0);}
+function spotItems(){const q=(S.spotQ||'').replace(/^\//,'').toLowerCase().split(/\s+/)[0];
+  return SPOT.filter(s=>!q||s.label.toLowerCase().includes(q)||s.act.startsWith(q));}
+// título digitado depois do comando: "/task Comprar domínio" → "Comprar domínio"
+function spotTitle(){return (S.spotQ||'').replace(/^\/?\s*(task|note|timer|goal)\b/i,'').trim();}
+function spotKey(e){if(e.key==='Enter'){const it=spotItems();if(it[0])runSpot(it[0].act);}}
+function spotlightPanel(){
+  const items=spotItems();
+  return `<div class="mscrim" onclick="closePanel()"></div><div class="swrap"><div class="scard">
+    <div style="display:flex;align-items:center;gap:12px;padding:17px 20px;border-bottom:1px solid var(--border)">
+      ${SV(I.bolt,18,1.7,'color:var(--accent)')}
+      <input id="spotInput" value="${(S.spotQ||'').replace(/"/g,'&quot;')}" onkeydown="spotKey(event)" oninput="S.spotQ=this.value;renderOverlay();setTimeout(()=>{const i=document.getElementById('spotInput');i&&(i.focus(),i.setSelectionRange(i.value.length,i.value.length));},0)" placeholder="Comando ou busca…   /task Comprar domínio   ·   /note   ·   /timer" style="flex:1;background:transparent;border:none;outline:none;color:var(--text-1);font:inherit;font-size:17px"/>
+      <span class="chip mono" style="font-size:10px">esc</span></div>
+    <div style="max-height:56vh;overflow:auto;padding:8px">
+      ${items.length?items.map((s,i)=>`<div class="spotitem ${i===0?'sel':''}" onclick="runSpot('${s.act}')"><span style="color:var(--text-3)">${SV(I[s.icon],18)}</span><div style="flex:1"><div style="font-size:14px;font-weight:540">${s.label}${i===0&&spotTitle()&&(s.act==='task'||s.act==='note')?`: <span style="color:var(--accent)">${spotTitle()}</span>`:''}</div><div class="faint" style="font-size:12px">${s.desc}</div></div>${i===0?'<span class="chip mono" style="font-size:10px">↵</span>':''}</div>`).join(''):'<div class="faint" style="padding:16px;font-size:13px">Nenhum comando</div>'}
+    </div></div></div>`;
+}
+function runSpot(act){const pid=spotPid(),title=spotTitle();
+  if(act==='task'){const t={id:uid(),name:title||'New task',obj:null,status:'todo',prio:0,due:null,tracked:0,desc:'',todos:[],props:[]};DATA[pid].tasks.push(t);S.route={pid};S.tab='tasks';openTask(t.id,!title);}
+  else if(act==='note'){const n={id:uid(),title:title||'New note',updated:'now',body:title?`# ${title}\n\n`:'# New note\n\n'};DATA[pid].notes.push(n);S.route={pid};S.tab='notas';openNote(n.id);}
+  else if(act==='goal'){closePanel();alert('mock: criaria uma meta');}
+  else{closePanel();alert('mock: começaria o cronômetro');}
+}
+
+// ============================================================ ações
+function openTask(id,focus){S.panel={type:'task',id};S.panelEdit=false;if(focus)S.focusTitle=true;render();}
+function openNote(id){S.panel={type:'note',id};S.panelEdit=false;render();}
+function closePanel(){S.panel=null;S.panelEdit=false;render();}
+function togglePanelMode(){S.panelMode=S.panelMode==='full'?'side':'full';render();}
+function setStatus(id,k){findTask(id).status=k;render();}
+function setPrio(id,p){findTask(id).prio=p;render();}
+function cycleStatus(id){const t=findTask(id);t.status=ORDER[(ORDER.indexOf(t.status)+1)%ORDER.length];render();}
+function cyclePrio(id){const t=findTask(id);t.prio=(t.prio+1)%4;render();}
+function dropStatus(k){if(dragId){findTask(dragId).status=k;dragId=null;render();}}
+function toggleTodo(tid,did){const x=findTask(tid).todos.find(x=>x.id===did);x.done=!x.done;render();}
+function toggleGoal(tid,did){const x=findTask(tid).todos.find(x=>x.id===did);x.goal=!x.goal;render();}
+function addTodo(tid,text){text=(text||'').trim();if(!text)return;findTask(tid).todos.push({id:uid(),t:text,done:false,goal:false});render();setTimeout(()=>{const el=document.getElementById('newtodo');el&&el.focus();},0);}
+function newTask(pid,status){const t={id:uid(),name:'New task',obj:null,status,prio:0,due:null,tracked:0,desc:'',todos:[],props:[]};DATA[pid].tasks.push(t);openTask(t.id,true);}
+function newNote(pid){const n={id:uid(),title:'Nova nota',updated:'agora',body:'# Nova nota\n\nEscreva em **Markdown**…'};DATA[pid].notes.push(n);openNote(n.id);}
+function calMove(d){let m=S.cal.m+d,y=S.cal.y;if(m<0){m=11;y--;}if(m>11){m=0;y++;}S.cal={y,m};render();}
+
+function render(){const main=document.getElementById('main');main.innerHTML=S.route==='list'?renderList():renderProject(S.route.pid);renderOverlay();
+  if(S.focusTitle){const el=document.getElementById('taskTitle');if(el){el.focus();try{el.select();}catch(e){}}S.focusTitle=false;}}
+function toggleTheme(){const el=document.documentElement;el.dataset.theme=el.dataset.theme==='dark'?'light':'dark';}
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSpotlight();}
+  else if(e.key==='Escape'&&S.panel&&S.panel.type==='spotlight')closePanel();
+});
+render();
+</script>
+</body>
+</html>

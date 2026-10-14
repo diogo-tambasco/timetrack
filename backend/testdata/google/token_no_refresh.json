@@ -1,0 +1,7 @@
+{
+  "access_token": "ya29.fixture-access-token-relogin",
+  "expires_in": 3599,
+  "scope": "openid email profile",
+  "token_type": "Bearer",
+  "id_token": "fixture-id-token"
+}

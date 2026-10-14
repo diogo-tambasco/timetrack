@@ -1,0 +1,41 @@
+# Ambiente LOCAL de dev/teste (CA-15). O artefato de produção é deploy/docker-compose.yml.
+services:
+  timetrack-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: timetrack
+      POSTGRES_PASSWORD: timetrack
+      POSTGRES_DB: timetrack
+    volumes:
+      - tt-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U timetrack -d timetrack']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  timetrack-app:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      DATABASE_URL: postgres://timetrack:timetrack@timetrack-db:5432/timetrack?sslmode=disable
+    depends_on:
+      timetrack-db:
+        condition: service_healthy
+
+  # Postgres efêmero pros testes Go (D-13): porta 5433, dados em tmpfs.
+  timetrack-db-test:
+    image: postgres:17-alpine
+    profiles: [test]
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: timetrack_test
+    tmpfs:
+      - /var/lib/postgresql/data
+
+volumes:
+  tt-db-data:

@@ -1,0 +1,44 @@
+# Timetrack — compose de PRODUÇÃO (artefato da fase 00; aplicar só na fase 09).
+# Isolamento da VPS compartilhada (CA-16):
+#   - NENHUM serviço publica porta (quem expõe é o Caddy EXISTENTE, via vhost)
+#   - NENHUM Caddy próprio aqui
+#   - rede do Caddy: primaos_primaos_net — nome REAL confirmado por inspeção
+#     read-only na VPS em 11/06 (fase 09 T-02; o primaos-caddy-1 tem alias
+#     'caddy' nela e resolve timetrack-app:8080 pelo nome do serviço)
+services:
+  timetrack-app:
+    build:
+      context: ..
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - primaos_primaos_net
+      - internal
+    depends_on:
+      timetrack-db:
+        condition: service_healthy
+
+  timetrack-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: timetrack
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: timetrack
+    volumes:
+      - tt-db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U timetrack -d timetrack']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+networks:
+  primaos_primaos_net:
+    external: true # rede do Caddy existente na VPS (confirmada 11/06 — plan 09 §1)
+  internal: {}
+
+volumes:
+  tt-db-data:
