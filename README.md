@@ -4,8 +4,6 @@ App pessoal de **cronometragem + planejamento de tempo** — consolida Toggl, Go
 flip clock do iPad em uma ferramenta só. Inspirado no Toggl 2.0, mas mais interativo,
 personalizável e com IA.
 
-🌐 **No ar:** [timetrack.live](https://www.timetrack.live)
-
 ## O que resolve
 
 1. Trackear tempo **rápido**, separando cliente/projeto.
@@ -33,7 +31,7 @@ Ordem de leitura dos docs: `REQUISITOS.md` → `DESIGN.md` → `SDD.md` → `TDD
 
 ## Status
 
-Em produção e em uso diário por mim. Projeto pessoal, construído com IA: cada feature tem a sua
+Projeto pessoal, construído com IA: cada feature tem a sua
 spec em `specs/` (32 fases), escrita antes do código.
 
 ## Rodar localmente
